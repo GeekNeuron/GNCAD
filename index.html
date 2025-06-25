@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GNCAD - Modern CAD Environment</title>
+    <title>GNCAD - Final Version</title>
     
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     
     <link rel="stylesheet" href="css/style.css">
@@ -15,21 +16,36 @@
         
         <header id="app-header">
             <h1>GNCAD</h1>
-            </header>
+            <div id="header-actions">
+                <div class="dropdown">
+                    <button id="file-menu-btn" class="header-btn">File</button>
+                    <div id="file-menu-dropdown" class="dropdown-content">
+                        <a href="#" id="new-btn">New Canvas</a>
+                        <a href="#" id="save-btn">Save Project</a>
+                        <a href="#" id="load-btn">Load Project</a>
+                        <hr>
+                        <a href="#" id="export-btn">Export Image...</a>
+                    </div>
+                </div>
+                <button id="undo-btn" class="header-btn" title="Undo (Ctrl+Z)">
+                    <span class="material-symbols-outlined">undo</span>
+                </button>
+                <button id="redo-btn" class="header-btn" title="Redo (Ctrl+Y)">
+                    <span class="material-symbols-outlined">redo</span>
+                </button>
+                <input type="file" id="file-input" accept=".gncad" style="display: none;">
+            </div>
+        </header>
 
         <aside id="left-toolbar">
-            <button class="tool-btn" id="select-tool-btn" title="Select (V)">
-                <span class="material-symbols-outlined">pan_tool</span>
-            </button>
-            <button class="tool-btn" id="wall-tool-btn" title="Draw Wall (L)">
-                <span class="material-symbols-outlined">line_start</span>
-            </button>
-            <button class="tool-btn" id="rect-tool-btn" title="Draw Room (R)">
-                <span class="material-symbols-outlined">check_box_outline_blank</span>
-            </button>
-             <button class="tool-btn" id="asset-tool-btn" title="Place Furniture (A)">
-                <span class="material-symbols-outlined">chair</span>
-            </button>
+            <button class="tool-btn" id="select-tool-btn" title="Select (V)"><span class="material-symbols-outlined">pan_tool</span></button>
+            <button class="tool-btn" id="wall-tool-btn" title="Draw Wall (L)"><span class="material-symbols-outlined">line_start</span></button>
+            <button class="tool-btn" id="rect-tool-btn" title="Draw Room (R)"><span class="material-symbols-outlined">check_box_outline_blank</span></button>
+            <button class="tool-btn" id="door-tool-btn" title="Place Door (P)"><span class="material-symbols-outlined">door_open</span></button>
+            <button class="tool-btn" id="window-tool-btn" title="Place Window (W)"><span class="material-symbols-outlined">window</span></button>
+            <button class="tool-btn" id="stairs-tool-btn" title="Draw Stairs (S)"><span class="material-symbols-outlined">stairs</span></button>
+            <button class="tool-btn" id="dimension-tool-btn" title="Dimension (D)"><span class="material-symbols-outlined">straighten</span></button>
+            <button class="tool-btn" id="asset-tool-btn" title="Place Furniture (A)"><span class="material-symbols-outlined">chair</span></button>
         </aside>
 
         <main id="canvas-container">
@@ -37,43 +53,57 @@
         </main>
 
         <aside id="right-panel">
+            <div id="layers-panel">
+                <h3>Layers</h3>
+                <ul id="layer-list">
+                    <li class="layer-item" data-layer="walls"><span>Walls</span><span class="material-symbols-outlined visibility-toggle" data-visible="true">visibility</span></li>
+                    <li class="layer-item" data-layer="furniture"><span>Furniture</span><span class="material-symbols-outlined visibility-toggle" data-visible="true">visibility</span></li>
+                    <li class="layer-item" data-layer="dimensions"><span>Dimensions</span><span class="material-symbols-outlined visibility-toggle" data-visible="true">visibility</span></li>
+                </ul>
+            </div>
             <div id="properties-panel">
                 <h3>Properties</h3>
-                <div id="panel-content-placeholder">Select an object to see its properties.</div>
-                <div id="panel-content-dynamic" class="hidden">
-                    <div class="prop-item">
-                        <label for="prop-width">Width (m)</label>
-                        <input type="number" id="prop-width" step="0.01">
-                    </div>
-                    <div class="prop-item">
-                        <label for="prop-height">Height (m)</label>
-                        <input type="number" id="prop-height">
-                    </div>
-                    <div class="prop-item">
-                        <label for="prop-area">Area (m²)</label>
-                        <input type="text" id="prop-area" disabled>
-                    </div>
+                <div id="panel-content">
+                    <div id="panel-content-placeholder">Select an object to see its properties.</div>
                 </div>
             </div>
-             <div id="asset-panel-container" class="hidden">
+            <div id="asset-panel-container" class="hidden">
                 <h3>Assets</h3>
-                <div id="asset-list">
-                    </div>
+                <div id="asset-list"></div>
             </div>
         </aside>
 
         <footer id="status-bar">
             <div id="coords-display">X: 0.00, Y: 0.00</div>
+            <div id="tool-tip"></div>
             <div id="zoom-display">Zoom: 100%</div>
-            <div id="snap-toggle">
+            <div class="toggle-container">
+                <input type="checkbox" id="show-dims-checkbox" checked>
+                <label for="show-dims-checkbox">Show Dimensions</label>
+            </div>
+            <div class="toggle-container" id="snap-toggle">
                 <input type="checkbox" id="snap-checkbox" checked>
                 <label for="snap-checkbox">Snap to Grid</label>
             </div>
         </footer>
+    </div>
 
+    <div id="export-modal-overlay" class="hidden"></div>
+    <div id="export-modal" class="hidden">
+        <div class="modal-header">
+            <h2>Export Image</h2>
+            <button id="close-modal-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="prop-item"><label>Format</label><div class="radio-group"><input type="radio" id="format-png" name="format" value="png" checked><label for="format-png">PNG</label><input type="radio" id="format-jpg" name="format" value="jpeg"><label for="format-jpg">JPG</label></div></div>
+            <div class="prop-item"><label for="export-scale">Resolution Scale</label><input type="number" id="export-scale" value="2" min="1" max="10"></div>
+            <div class="prop-item" id="quality-wrapper" style="display: none;"><label for="export-quality">JPG Quality (0.1 - 1.0)</label><input type="number" id="export-quality" value="0.9" min="0.1" max="1.0" step="0.1"></div>
+        </div>
+        <div class="modal-footer"><button id="download-btn" class="action-btn">Download</button></div>
     </div>
 
     <script src="lib/fabric.min.js"></script>
     <script src="js/main.js"></script>
-    </body>
+
+</body>
 </html>
