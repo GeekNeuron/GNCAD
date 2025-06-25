@@ -1,0 +1,155 @@
+/* Google Fonts for a modern look */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap');
+
+/* CSS Variables for Theming */
+:root {
+    --font-primary: 'Roboto', sans-serif;
+    --font-header: 'Orbitron', sans-serif;
+}
+
+.dark-theme {
+    --bg-color: #1a1a2e;
+    --bg-panel: #16213e;
+    --header-bg: #0f3460;
+    --text-color: #e94560;
+    --text-muted: #c0c0c0;
+    --border-color: #e94560;
+    --canvas-bg: #2a2a3e;
+    --button-bg: #e94560;
+    --button-text: #ffffff;
+}
+
+.light-theme {
+    --bg-color: #f0f2f5;
+    --bg-panel: #ffffff;
+    --header-bg: #4a90e2;
+    --text-color: #333333;
+    --text-muted: #555555;
+    --border-color: #4a90e2;
+    --canvas-bg: #e9e9e9;
+    --button-bg: #4a90e2;
+    --button-text: #ffffff;
+}
+
+/* General Styles */
+body {
+    margin: 0;
+    font-family: var(--font-primary);
+    background-color: var(--bg-color);
+    color: var(--text-muted);
+    transition: background-color 0.3s, color 0.3s;
+    overflow: hidden;
+}
+
+#main-header {
+    background-color: var(--header-bg);
+    color: var(--text-color);
+    text-align: center;
+    padding: 5px;
+    font-family: var(--font-header);
+    cursor: pointer;
+    user-select: none;
+    border-bottom: 2px solid var(--border-color);
+}
+
+#editor-container {
+    display: flex;
+    height: calc(100vh - 60px);
+}
+
+/* Panels (Assets & Toolbar) */
+#asset-panel, #toolbar {
+    width: 200px;
+    background-color: var(--bg-panel);
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+#asset-panel {
+    border-right: 2px solid var(--border-color);
+}
+
+#toolbar {
+    border-left: 2px solid var(--border-color);
+}
+
+h2 {
+    color: var(--text-color);
+    font-family: var(--font-header);
+    margin-top: 0;
+    text-align: center;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Asset List */
+#asset-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.asset-item {
+    background-color: var(--canvas-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    padding: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.asset-item:hover {
+    transform: scale(1.1);
+    background-color: var(--bg-color);
+}
+
+.asset-item img {
+    width: 100%;
+    height: auto;
+    filter: invert(80%); /* Makes SVG icons visible on dark backgrounds */
+}
+
+/* Main Canvas Area */
+#canvas-container {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+canvas {
+    border: 1px dashed var(--border-color);
+    border-radius: 5px;
+}
+
+/* Toolbar items */
+.tool-group {
+    margin-bottom: 20px;
+}
+.tool-group h3 {
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--text-muted);
+    padding-bottom: 5px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background-color: var(--button-bg);
+    color: var(--button-text);
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: var(--font-primary);
+    font-weight: bold;
+    transition: opacity 0.2s;
+}
+
+button:hover {
+    opacity: 0.9;
+}
