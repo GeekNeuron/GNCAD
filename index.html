@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GNCAD</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="dark-theme">
+
+    <header id="main-header">
+        <h1>GNCAD</h1>
+    </header>
+
+    <div id="editor-container">
+        <aside id="asset-panel">
+            <h2>Assets</h2>
+            <div id="asset-list">
+                </div>
+        </aside>
+
+        <main id="canvas-container">
+            <canvas id="gn-canvas"></canvas>
+        </main>
+
+        <aside id="toolbar">
+            <h2>Tools</h2>
+            <div class="tool-group">
+                <h3>Export</h3>
+                <button id="export-jpg-btn">Export as JPG</button>
+                <button id="export-dxf-btn">Export as DXF</button>
+            </div>
+        </aside>
+    </div>
+
+    <script src="lib/fabric.min.js"></script>
+    
+    <script src="js/dxf-exporter.js"></script>
+    <script src="js/main.js"></script>
+
+</body>
+</html>
