@@ -1,64 +1,27 @@
-/**
- * GNCAD DXF Exporter
- * Converts Fabric.js canvas objects to a basic DXF format string.
- * Supports: lines, polylines (for rects), circles.
- * Note: This is a simplified exporter.
- */
+// js/dxf-exporter.js
+
 function exportToDXF(canvas) {
     let dxf = '';
-
-    const header = `
-0
-SECTION
-2
-HEADER
-9
-$ACADVER
-1
-AC1009
-0
-ENDSEC
-0
-SECTION
-2
-TABLES
-0
-TABLE
-2
-LTYPE
-70
-1
-0
-LTYPE
-2
-CONTINUOUS
-3
-Solid line
-72
-65
-73
-0
-40
-0.0
-0
-ENDTAB
-0
-ENDSEC
-0
-SECTION
-2
-ENTITIES
-`;
+    const header = `0\nSECTION\n2\nHEADER\n9\n$ACADVER\n1\nAC1009\n0\nENDSEC\n0\nSECTION\n2\nTABLES\n0\nTABLE\n2\nLTYPE\n70\n1\n0\nLTYPE\n2\nCONTINUOUS\n3\nSolid line\n72\n65\n73\n0\n40\n0.0\n0\nENDTAB\n0\nENDSEC\n0\nSECTION\n2\nENTITIES\n`;
     dxf += header.trim() + '\n';
 
     canvas.getObjects().forEach(obj => {
-        // We handle group (SVG) objects by iterating their inner objects
-        if (obj.type === 'group') {
-             obj._objects.forEach(member => {
-                dxf += objectToDxf(member, obj.left, obj.top, obj.scaleX, obj.scaleY, obj.angle);
-             });
-        } else {
-             dxf += objectToDxf(obj, obj.left, obj.top, obj.scaleX, obj.scaleY, obj.angle);
+        if (obj.name === 'grid' || obj.name === 'temp' || (obj.data && obj.data.isDimensionLabel)) return;
+
+        if (obj.data && obj.data.type === 'room') {
+            const rect = obj._objects.find(o => o.type === 'rect');
+            if(rect) dxf += rectToDxf(rect, obj.getCenterPoint(), obj.angle);
+        } else if (obj.data && obj.data.type === 'wall-system') {
+            obj._objects.forEach(line => {
+                if (line.type === 'line') {
+                     const p1 = new fabric.Point(line.x1, line.y1);
+                     const p2 = new fabric.Point(line.x2, line.y2);
+                     const matrix = obj.calcTransformMatrix();
+                     const transformedP1 = fabric.util.transformPoint(p1, matrix);
+                     const transformedP2 = fabric.util.transformPoint(p2, matrix);
+                     dxf += lineToDxf(transformedP1, transformedP2);
+                }
+            });
         }
     });
 
@@ -66,40 +29,34 @@ ENTITIES
     return dxf;
 }
 
-function objectToDxf(obj, groupLeft = 0, groupTop = 0, groupScaleX = 1, groupScaleY = 1, groupAngle = 0) {
-    let entityDxf = '';
+function lineToDxf(p1, p2) {
+    let entityDxf = `0\nLINE\n8\n0\n`;
+    entityDxf += `10\n${p1.x}\n20\n${-p1.y}\n`;
+    entityDxf += `11\n${p2.x}\n21\n${-p2.y}\n`;
+    return entityDxf;
+}
+
+function rectToDxf(rect, center, angle) {
+    const w = rect.getScaledWidth();
+    const h = rect.getScaledHeight();
+    const angleRad = -angle * Math.PI / 180; // DXF uses clockwise angles
     
-    // Note: This exporter is basic and does not handle grouped object rotation/scaling perfectly.
-    // For simplicity, we use the object's original properties within a group.
-    const left = groupLeft;
-    const top = groupTop;
+    // Get corners relative to center
+    const corners = [
+        {x: -w/2, y: -h/2}, {x: w/2, y: -h/2},
+        {x: w/2, y: h/2}, {x: -w/2, y: h/2}
+    ];
 
-    switch (obj.type) {
-        case 'line':
-            entityDxf += `0\nLINE\n8\n0\n`; // Layer 0
-            entityDxf += `10\n${obj.x1}\n20\n${-obj.y1}\n`; // Start point (Y is inverted in DXF)
-            entityDxf += `11\n${obj.x2}\n21\n${-obj.y2}\n`; // End point
-            break;
+    // Rotate and translate corners
+    const finalCorners = corners.map(c => {
+        const rotatedX = c.x * Math.cos(angleRad) - c.y * Math.sin(angleRad);
+        const rotatedY = c.x * Math.sin(angleRad) + c.y * Math.cos(angleRad);
+        return { x: center.x + rotatedX, y: center.y + rotatedY };
+    });
 
-        case 'rect':
-            // Represent rect as a closed polyline
-            const w = obj.width * obj.scaleX;
-            const h = obj.height * obj.scaleY;
-            const x = obj.left;
-            const y = -obj.top; // Invert Y
-            
-            entityDxf += `0\nLWPOLYLINE\n8\n0\n90\n4\n70\n1\n`; // 4 vertices, closed
-            entityDxf += `10\n${x - w/2}\n20\n${y + h/2}\n`;
-            entityDxf += `10\n${x + w/2}\n20\n${y + h/2}\n`;
-            entityDxf += `10\n${x + w/2}\n20\n${y - h/2}\n`;
-            entityDxf += `10\n${x - w/2}\n20\n${y - h/2}\n`;
-            break;
-            
-        case 'circle':
-            entityDxf += `0\nCIRCLE\n8\n0\n`;
-            entityDxf += `10\n${obj.left}\n20\n${-obj.top}\n`; // Center point
-            entityDxf += `40\n${obj.radius * obj.scaleX}\n`; // Radius
-            break;
-    }
+    let entityDxf = `0\nLWPOLYLINE\n8\n0\n90\n4\n70\n1\n`; // 4 vertices, closed
+    finalCorners.forEach(c => {
+        entityDxf += `10\n${c.x}\n20\n${-c.y}\n`;
+    });
     return entityDxf;
 }
