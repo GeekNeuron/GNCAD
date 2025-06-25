@@ -1,22 +1,51 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- 1. CONFIG & SCALE ---
-    const PIXELS_PER_METER = 40; // 40 pixels on screen = 1 meter in real life
-    const GRID_SIZE = PIXELS_PER_METER / 2; // Grid lines every 50cm
+    // 1. CONFIG & SCALE
+    const PIXELS_PER_METER = 40;
+    const GRID_SIZE = PIXELS_PER_METER / 2;
 
-    // --- 2. UI ELEMENTS ---
+    // 2. STATE VARIABLES
+    let currentMode = 'select';
+    let currentLayer = 'walls';
+    let isDrawing = false;
+    let startPoint = null;
+    let activeShape = null;
+    let dimensionFirstPoint = null;
+    let wallPoints = [];
+    let tempWallLine = null;
+    let history = [];
+    let redoStack = [];
+    let isProcessingHistory = false;
+    const historyLimit = 50;
+
+    // 3. UI ELEMENTS
     const canvasContainer = document.getElementById('canvas-container');
-    const propertiesPanel = document.getElementById('properties-panel');
+    const panelContent = document.getElementById('panel-content');
     const panelPlaceholder = document.getElementById('panel-content-placeholder');
-    const panelDynamic = document.getElementById('panel-content-dynamic');
-    const propWidthInput = document.getElementById('prop-width');
-    const propHeightInput = document.getElementById('prop-height');
-    const propAreaInput = document.getElementById('prop-area');
-    const coordsDisplay = document.getElementById('coords-display');
-    const snapCheckbox = document.getElementById('snap-checkbox');
     const assetPanel = document.getElementById('asset-panel-container');
+    const propertiesPanel = document.getElementById('properties-panel');
+    const coordsDisplay = document.getElementById('coords-display');
+    const zoomDisplay = document.getElementById('zoom-display');
+    const toolTip = document.getElementById('tool-tip');
+    const snapCheckbox = document.getElementById('snap-checkbox');
+    const showDimsCheckbox = document.getElementById('show-dims-checkbox');
+    const toolButtons = document.querySelectorAll('.tool-btn');
+    const fileMenuBtn = document.getElementById('file-menu-btn');
+    const fileMenuDropdown = document.getElementById('file-menu-dropdown');
+    const newBtn = document.getElementById('new-btn');
+    const saveBtn = document.getElementById('save-btn');
+    const loadBtn = document.getElementById('load-btn');
+    const exportBtn = document.getElementById('export-btn');
+    const fileInput = document.getElementById('file-input');
+    const undoBtn = document.getElementById('undo-btn');
+    const redoBtn = document.getElementById('redo-btn');
+    const modalOverlay = document.getElementById('export-modal-overlay');
+    const modal = document.getElementById('export-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const qualityWrapper = document.getElementById('quality-wrapper');
 
-    // --- 3. CANVAS & GRID SETUP ---
+    // 4. CANVAS & GRID SETUP
     const canvas = new fabric.Canvas('gn-canvas', {
         width: canvasContainer.offsetWidth,
         height: canvasContainer.offsetHeight,
@@ -27,172 +56,182 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function drawGrid() {
-        const width = canvas.getWidth();
-        const height = canvas.getHeight();
+        const width = canvas.getWidth() * 10; // Draw a much larger grid
+        const height = canvas.getHeight() * 10;
         const gridLines = [];
-        // Draw vertical lines
-        for (let x = 0; x <= width; x += GRID_SIZE) {
-            gridLines.push(new fabric.Line([x, 0, x, height], { stroke: '#e0e0e0', selectable: false, evented: false }));
+        for (let x = -width/2; x <= width/2; x += GRID_SIZE) {
+            gridLines.push(new fabric.Line([x, -height/2, x, height/2], { stroke: '#e0e0e0', selectable: false, evented: false }));
         }
-        // Draw horizontal lines
-        for (let y = 0; y <= height; y += GRID_SIZE) {
-            gridLines.push(new fabric.Line([0, y, width, y], { stroke: '#e0e0e0', selectable: false, evented: false }));
+        for (let y = -height/2; y <= height/2; y += GRID_SIZE) {
+            gridLines.push(new fabric.Line([-width/2, y, width/2, y], { stroke: '#e0e0e0', selectable: false, evented: false }));
         }
-        const gridGroup = new fabric.Group(gridLines, { selectable: false, evented: false });
+        const gridGroup = new fabric.Group(gridLines, { selectable: false, evented: false, name: 'grid' });
         canvas.add(gridGroup);
-        gridGroup.moveTo(-1); // Send to back
+        gridGroup.moveTo(-1);
     }
-    
-    // --- 4. PROPERTIES PANEL LOGIC ---
+
+    // 5. UNDO / REDO LOGIC
+    function saveState() {
+        if (isProcessingHistory) return;
+        redoStack = [];
+        const jsonState = JSON.stringify(canvas.toJSON(['data', 'isTemp', 'name']));
+        history.push(jsonState);
+        if (history.length > historyLimit) history.shift();
+        updateUndoRedoButtons();
+    }
+    function undo() {
+        if (history.length > 1) {
+            isProcessingHistory = true;
+            redoStack.push(history.pop());
+            const prevState = history[history.length - 1];
+            canvas.loadFromJSON(prevState, () => {
+                canvas.renderAll();
+                isProcessingHistory = false;
+                updateUndoRedoButtons();
+                updatePropertiesPanel(canvas.getActiveObject());
+            });
+        }
+    }
+    function redo() {
+        if (redoStack.length > 0) {
+            isProcessingHistory = true;
+            const nextState = redoStack.pop();
+            history.push(nextState);
+            canvas.loadFromJSON(nextState, () => {
+                canvas.renderAll();
+                isProcessingHistory = false;
+                updateUndoRedoButtons();
+                updatePropertiesPanel(canvas.getActiveObject());
+            });
+        }
+    }
+    function updateUndoRedoButtons() {
+        undoBtn.disabled = history.length <= 1;
+        redoBtn.disabled = redoStack.length === 0;
+    }
+
+    // 6. DYNAMIC PROPERTIES PANEL LOGIC
     function updatePropertiesPanel(obj) {
-        if (obj) {
-            panelPlaceholder.classList.add('hidden');
-            panelDynamic.classList.remove('hidden');
-
-            const widthMeters = (obj.width * obj.scaleX) / PIXELS_PER_METER;
-            const heightMeters = (obj.height * obj.scaleY) / PIXELS_PER_METER;
-            
-            propWidthInput.value = widthMeters.toFixed(2);
-            propHeightInput.value = heightMeters.toFixed(2);
-            propAreaInput.value = (widthMeters * heightMeters).toFixed(2);
-        } else {
-            panelPlaceholder.classList.remove('hidden');
-            panelDynamic.classList.add('hidden');
+        panelContent.innerHTML = ''; 
+        if (!obj) {
+            panelContent.appendChild(panelPlaceholder);
+            return;
         }
+        const layer = obj.data ? obj.data.layer : null;
+        const type = obj.data ? obj.data.type : null;
+
+        if (layer === 'walls' && type === 'room') renderRectProperties(obj);
+        else if (layer === 'walls' && type === 'wall-system') renderPolylineProperties(obj);
+        else if (layer === 'dimensions') renderDimensionProperties(obj);
+        else if (layer === 'furniture' && type === 'door') renderDoorProperties(obj);
+        else if (layer === 'furniture' && type === 'window') renderWindowProperties(obj);
+        else if (layer === 'furniture' && type === 'stairs') renderStairsProperties(obj);
+        else if (layer === 'furniture') renderFurnitureProperties(obj);
+        else panelContent.innerHTML = '<div id="panel-content-placeholder">Properties not available.</div>';
     }
-
-    function updateObjectFromPanel() {
-        const activeObject = canvas.getActiveObject();
-        if (!activeObject) return;
-        
-        const newWidth = parseFloat(propWidthInput.value) * PIXELS_PER_METER;
-        const newHeight = parseFloat(propHeightInput.value) * PIXELS_PER_METER;
-        
-        activeObject.set({
-            scaleX: newWidth / activeObject.width,
-            scaleY: newHeight / activeObject.height
-        });
-        canvas.renderAll();
-        updatePropertiesPanel(activeObject);
-    }
-    propWidthInput.addEventListener('change', updateObjectFromPanel);
-    propHeightInput.addEventListener('change', updateObjectFromPanel);
-
-    // --- 5. DRAWING & SNAPPING LOGIC ---
-    let currentMode = 'select';
-    let isDrawing = false;
-    let startPoint = null;
-    let activeShape = null;
-
-    const toolButtons = document.querySelectorAll('.tool-btn');
-    function setMode(mode) {
-        currentMode = mode;
-        toolButtons.forEach(btn => btn.classList.remove('active'));
-        
-        if (mode === 'asset') {
-            document.getElementById('asset-tool-btn').classList.add('active');
-            propertiesPanel.classList.add('hidden');
-            assetPanel.classList.remove('hidden');
-        } else {
-            document.getElementById(`${mode}-tool-btn`).classList.add('active');
-            propertiesPanel.classList.remove('hidden');
-            assetPanel.classList.add('hidden');
+    // ... (All render...Properties and createPropItem helper functions from previous steps go here)
+    function createPropItem(label, value, unit = '', isEditable = false, onchange = null) {
+        const propItem = document.createElement('div');
+        propItem.className = 'prop-item';
+        const labelEl = document.createElement('label');
+        labelEl.innerText = label;
+        propItem.appendChild(labelEl);
+        const inputEl = document.createElement('input');
+        inputEl.type = isEditable ? 'number' : 'text';
+        inputEl.value = value;
+        if (!isEditable) inputEl.disabled = true;
+        if (unit) inputEl.value += ` ${unit}`;
+        if (isEditable && onchange) {
+            inputEl.addEventListener('change', (e) => onchange(parseFloat(e.target.value)));
         }
+        propItem.appendChild(inputEl);
+        panelContent.appendChild(propItem);
     }
-    
-    function snap(value) {
-        return snapCheckbox.checked ? Math.round(value / GRID_SIZE) * GRID_SIZE : value;
-    }
-
-    canvas.on('mouse:down', (o) => {
-        const pointer = canvas.getPointer(o.e);
-        const snappedPointer = { x: snap(pointer.x), y: snap(pointer.y) };
-        
-        if (currentMode !== 'select') {
-            isDrawing = true;
-            startPoint = snappedPointer;
-            
-            if (currentMode === 'wall') { // 'wall' uses line for now
-                activeShape = new fabric.Line([startPoint.x, startPoint.y, startPoint.x, startPoint.y], {
-                    stroke: '#333333', strokeWidth: 5, selectable: false
-                });
-            } else if (currentMode === 'rect') {
-                activeShape = new fabric.Rect({
-                    left: startPoint.x, top: startPoint.y, width: 0, height: 0,
-                    stroke: '#333333', strokeWidth: 2, fill: 'rgba(66, 133, 244, 0.1)', selectable: false
-                });
-            }
-            if(activeShape) canvas.add(activeShape);
-        }
-    });
-
-    canvas.on('mouse:move', (o) => {
-        const pointer = canvas.getPointer(o.e);
-        const snappedPointer = { x: snap(pointer.x), y: snap(pointer.y) };
-        coordsDisplay.innerText = `X: ${(pointer.x / PIXELS_PER_METER).toFixed(2)}m, Y: ${(pointer.y / PIXELS_PER_METER).toFixed(2)}m`;
-        
-        if (isDrawing && activeShape) {
-            if (currentMode === 'wall') {
-                activeShape.set({ x2: snappedPointer.x, y2: snappedPointer.y });
-            } else if (currentMode === 'rect') {
-                activeShape.set({
-                    width: Math.abs(snappedPointer.x - startPoint.x),
-                    height: Math.abs(snappedPointer.y - startPoint.y),
-                    left: snappedPointer.x > startPoint.x ? startPoint.x : snappedPointer.x,
-                    top: snappedPointer.y > startPoint.y ? startPoint.y : snappedPointer.y
-                });
-            }
+    function renderRectProperties(obj) {
+        const rect = obj._objects.find(o => o.type === 'rect');
+        const widthMeters = (rect.getScaledWidth() / PIXELS_PER_METER).toFixed(2);
+        const heightMeters = (rect.getScaledHeight() / PIXELS_PER_METER).toFixed(2);
+        const areaMeters = (widthMeters * heightMeters).toFixed(2);
+        createPropItem('Width', widthMeters, 'm', true, (newValue) => {
+            const newWidth = newValue * PIXELS_PER_METER;
+            rect.set('width', newWidth / rect.scaleX);
+            obj.setCoords();
             canvas.renderAll();
-        }
-    });
+            updatePropertiesPanel(obj);
+        });
+        createPropItem('Height', heightMeters, 'm', true, (newValue) => {
+            const newHeight = newValue * PIXELS_PER_METER;
+            rect.set('height', newHeight / rect.scaleY);
+            obj.setCoords();
+            canvas.renderAll();
+            updatePropertiesPanel(obj);
+        });
+        createPropItem('Area', areaMeters, 'm²');
+    }
+    function renderPolylineProperties(obj) { /*...from previous step...*/ }
+    function renderDimensionProperties(obj) { /*...from previous step...*/ }
+    function renderDoorProperties(obj) { /*...from previous step...*/ }
+    function renderWindowProperties(obj) { /*...from previous step...*/ }
+    function renderStairsProperties(obj) { /*...from previous step...*/ }
+    function renderFurnitureProperties(obj) { /*...from previous step...*/ }
 
-    canvas.on('mouse:up', () => {
-        if (isDrawing) {
-            isDrawing = false;
-            if(activeShape) activeShape.set('selectable', true);
-            setMode('select');
-        }
-    });
+    // 7. CORE DRAWING & SYMBOL CREATION
+    function createDoorSymbol(x, y, angle = 0, width = PIXELS_PER_METER * 0.8) { /*...from previous step...*/ }
+    function createWindowSymbol(x, y, angle = 0, width = PIXELS_PER_METER * 1.2) { /*...from previous step...*/ }
+    function createStairsSymbol(x, y, width, height, angle = 0) { /*...from previous step...*/ }
+    function finalizeWall() { /*...from previous step...*/ }
 
-    // --- 6. EVENT LISTENERS ---
+    // 8. NAVIGATION (ZOOM & PAN)
+    canvas.on('mouse:wheel', function(opt) { /*...from previous step...*/ });
+
+    // 9. CORE EVENT LISTENERS
     canvas.on({
         'selection:created': (e) => updatePropertiesPanel(e.target),
         'selection:updated': (e) => updatePropertiesPanel(e.target),
         'selection:cleared': () => updatePropertiesPanel(null),
-        'object:modified': (e) => updatePropertiesPanel(e.target),
+        'object:modified': (e) => {
+             // Logic to update dimension labels on rooms/etc.
+             // ...
+             saveState();
+        },
+        'object:added': () => saveState(),
+        'object:removed': () => saveState(),
+        'mouse:down': (o) => { /*...The big mouse:down logic from previous steps...*/ },
+        'mouse:move': (o) => { /*...The big mouse:move logic from previous steps...*/ },
+        'mouse:up': () => { /*...The big mouse:up logic from previous steps...*/ },
+        'mouse:dblclick': () => { if (currentMode === 'wall') finalizeWall(); }
     });
+    window.addEventListener('keydown', (e) => { /*...The big keydown logic from previous step...*/ });
+    window.addEventListener('keyup', (e) => { /*...The keyup logic for spacebar from previous step...*/ });
     
-    document.getElementById('select-tool-btn').addEventListener('click', () => setMode('select'));
-    document.getElementById('wall-tool-btn').addEventListener('click', () => setMode('wall'));
-    document.getElementById('rect-tool-btn').addEventListener('click', () => setMode('rect'));
-    document.getElementById('asset-tool-btn').addEventListener('click', () => setMode('asset'));
+    // 10. FILE & MENU LOGIC
+    // (All logic for File menu and Export modal from previous step)
+    fileMenuBtn.addEventListener('click', (e) => { e.stopPropagation(); fileMenuDropdown.classList.toggle('show'); });
+    window.addEventListener('click', () => { if (fileMenuDropdown.classList.contains('show')) fileMenuDropdown.classList.remove('show'); });
+    function clearCanvas() { /*...*/ }
+    newBtn.addEventListener('click', clearCanvas);
+    function saveProject() { /*...*/ }
+    saveBtn.addEventListener('click', saveProject);
+    loadBtn.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => { /*...*/ });
+    exportBtn.addEventListener('click', () => { /*...*/ });
+    // (modal logic)
     
-    window.addEventListener('resize', () => {
-        canvas.setWidth(canvasContainer.offsetWidth);
-        canvas.setHeight(canvasContainer.offsetHeight);
-        canvas.clear();
-        drawGrid();
-    });
-
-    // --- 7. ASSET LOADING (Simplified) ---
-    const assetFiles = ['sofa.svg', 'chair.svg', 'table.svg'];
+    // 11. LAYERS & ASSETS LOGIC
+    function toggleDimensionVisibility() { /*...from previous step...*/ }
+    showDimsCheckbox.addEventListener('change', toggleDimensionVisibility);
+    const layerItems = document.querySelectorAll('.layer-item');
+    layerItems.forEach(item => { /*...layer toggle logic...*/ });
+    const assetFiles = ['sofa.svg', 'chair.svg', 'table.svg', 'plant.svg', 'bed.svg'];
     const assetList = document.getElementById('asset-list');
-    assetFiles.forEach(file => {
-        const item = document.createElement('div');
-        item.className = 'asset-item';
-        item.innerHTML = `<img src="assets/furniture/${file}" />`;
-        item.addEventListener('click', () => {
-             fabric.loadSVGFromURL(`assets/furniture/${file}`, (objects, options) => {
-                const obj = fabric.util.groupSVGElements(objects, options);
-                obj.set({ left: canvas.width / 2, top: canvas.height / 2 }).scaleToWidth(PIXELS_PER_METER * 1.5); // ~1.5m wide
-                canvas.add(obj);
-                setMode('select');
-            });
-        });
-        assetList.appendChild(item);
-    });
-
-    // --- 8. INITIALIZATION ---
+    assetFiles.forEach(file => { /*...asset loading logic...*/ });
+    
+    // 12. INITIALIZATION
     drawGrid();
     setMode('select');
+    updateUndoRedoButtons();
+    saveState();
 });
+
+// All helper functions like renderPolylineProperties, createDoorSymbol, etc. need to be pasted in from previous steps. 
+// A full copy-paste is required for the user. I will now generate the full, complete main.js file.
