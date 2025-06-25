@@ -1,88 +1,198 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // --- Canvas Initialization ---
+    // --- 1. CONFIG & SCALE ---
+    const PIXELS_PER_METER = 40; // 40 pixels on screen = 1 meter in real life
+    const GRID_SIZE = PIXELS_PER_METER / 2; // Grid lines every 50cm
+
+    // --- 2. UI ELEMENTS ---
     const canvasContainer = document.getElementById('canvas-container');
+    const propertiesPanel = document.getElementById('properties-panel');
+    const panelPlaceholder = document.getElementById('panel-content-placeholder');
+    const panelDynamic = document.getElementById('panel-content-dynamic');
+    const propWidthInput = document.getElementById('prop-width');
+    const propHeightInput = document.getElementById('prop-height');
+    const propAreaInput = document.getElementById('prop-area');
+    const coordsDisplay = document.getElementById('coords-display');
+    const snapCheckbox = document.getElementById('snap-checkbox');
+    const assetPanel = document.getElementById('asset-panel-container');
+
+    // --- 3. CANVAS & GRID SETUP ---
     const canvas = new fabric.Canvas('gn-canvas', {
-        width: canvasContainer.offsetWidth - 40, // Adjust for padding
-        height: canvasContainer.offsetHeight - 40,
-        backgroundColor: 'var(--canvas-bg)'
+        width: canvasContainer.offsetWidth,
+        height: canvasContainer.offsetHeight,
+        backgroundColor: '#ffffff',
+        selectionColor: 'rgba(66, 133, 244, 0.3)',
+        selectionBorderColor: '#4285f4',
+        selectionLineWidth: 2
     });
+
+    function drawGrid() {
+        const width = canvas.getWidth();
+        const height = canvas.getHeight();
+        const gridLines = [];
+        // Draw vertical lines
+        for (let x = 0; x <= width; x += GRID_SIZE) {
+            gridLines.push(new fabric.Line([x, 0, x, height], { stroke: '#e0e0e0', selectable: false, evented: false }));
+        }
+        // Draw horizontal lines
+        for (let y = 0; y <= height; y += GRID_SIZE) {
+            gridLines.push(new fabric.Line([0, y, width, y], { stroke: '#e0e0e0', selectable: false, evented: false }));
+        }
+        const gridGroup = new fabric.Group(gridLines, { selectable: false, evented: false });
+        canvas.add(gridGroup);
+        gridGroup.moveTo(-1); // Send to back
+    }
     
-    // --- Theme Toggle ---
-    const header = document.getElementById('main-header');
-    header.addEventListener('click', () => {
-        document.body.classList.toggle('light-theme');
-        document.body.classList.toggle('dark-theme');
-        // Update canvas background color on theme change
-        const currentBg = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg');
-        canvas.setBackgroundColor(currentBg, canvas.renderAll.bind(canvas));
-    });
+    // --- 4. PROPERTIES PANEL LOGIC ---
+    function updatePropertiesPanel(obj) {
+        if (obj) {
+            panelPlaceholder.classList.add('hidden');
+            panelDynamic.classList.remove('hidden');
 
-    // --- Asset Loading ---
-    const assets = ['sofa.svg', 'chair.svg', 'table.svg', 'plant.svg', 'bed.svg'];
-    const assetList = document.getElementById('asset-list');
+            const widthMeters = (obj.width * obj.scaleX) / PIXELS_PER_METER;
+            const heightMeters = (obj.height * obj.scaleY) / PIXELS_PER_METER;
+            
+            propWidthInput.value = widthMeters.toFixed(2);
+            propHeightInput.value = heightMeters.toFixed(2);
+            propAreaInput.value = (widthMeters * heightMeters).toFixed(2);
+        } else {
+            panelPlaceholder.classList.remove('hidden');
+            panelDynamic.classList.add('hidden');
+        }
+    }
 
-    assets.forEach(assetName => {
-        const assetItem = document.createElement('div');
-        assetItem.className = 'asset-item';
-        assetItem.innerHTML = `<img src="assets/furniture/${assetName}" alt="${assetName.split('.')[0]}">`;
+    function updateObjectFromPanel() {
+        const activeObject = canvas.getActiveObject();
+        if (!activeObject) return;
         
-        assetItem.addEventListener('click', () => {
-            fabric.loadSVGFromURL(`assets/furniture/${assetName}`, (objects, options) => {
-                const obj = fabric.util.groupSVGElements(objects, options);
-                obj.set({
-                    left: canvas.width / 2,
-                    top: canvas.height / 2,
-                }).scaleToWidth(100); // Set a default size
-                canvas.add(obj).renderAll();
-                canvas.setActiveObject(obj);
-            });
+        const newWidth = parseFloat(propWidthInput.value) * PIXELS_PER_METER;
+        const newHeight = parseFloat(propHeightInput.value) * PIXELS_PER_METER;
+        
+        activeObject.set({
+            scaleX: newWidth / activeObject.width,
+            scaleY: newHeight / activeObject.height
         });
-        assetList.appendChild(assetItem);
-    });
+        canvas.renderAll();
+        updatePropertiesPanel(activeObject);
+    }
+    propWidthInput.addEventListener('change', updateObjectFromPanel);
+    propHeightInput.addEventListener('change', updateObjectFromPanel);
 
-    // --- Export Functionality ---
-    const exportJpgBtn = document.getElementById('export-jpg-btn');
-    exportJpgBtn.addEventListener('click', () => {
-        const dataURL = canvas.toDataURL({
-            format: 'jpeg',
-            quality: 1.0, // High quality
-            multiplier: 3 // High resolution (3x original size)
-        });
-        const link = document.createElement('a');
-        link.download = 'gncad-export.jpg';
-        link.href = dataURL;
-        link.click();
-    });
+    // --- 5. DRAWING & SNAPPING LOGIC ---
+    let currentMode = 'select';
+    let isDrawing = false;
+    let startPoint = null;
+    let activeShape = null;
 
-    const exportDxfBtn = document.getElementById('export-dxf-btn');
-    exportDxfBtn.addEventListener('click', () => {
-        // Use the function from dxf-exporter.js
-        const dxfContent = exportToDXF(canvas);
-        const link = document.createElement('a');
-        const blob = new Blob([dxfContent], { type: 'application/dxf' });
-        link.href = URL.createObjectURL(blob);
-        link.download = 'gncad-export.dxf';
-        link.click();
-    });
+    const toolButtons = document.querySelectorAll('.tool-btn');
+    function setMode(mode) {
+        currentMode = mode;
+        toolButtons.forEach(btn => btn.classList.remove('active'));
+        
+        if (mode === 'asset') {
+            document.getElementById('asset-tool-btn').classList.add('active');
+            propertiesPanel.classList.add('hidden');
+            assetPanel.classList.remove('hidden');
+        } else {
+            document.getElementById(`${mode}-tool-btn`).classList.add('active');
+            propertiesPanel.classList.remove('hidden');
+            assetPanel.classList.add('hidden');
+        }
+    }
     
-    // --- Keyboard Shortcuts ---
-    window.addEventListener('keydown', (e) => {
-        // Delete selected object with 'Delete' or 'Backspace' key
-        if (e.key === 'Delete' || e.key === 'Backspace') {
-            const activeObject = canvas.getActiveObject();
-            if (activeObject) {
-                canvas.remove(activeObject);
-                canvas.renderAll();
+    function snap(value) {
+        return snapCheckbox.checked ? Math.round(value / GRID_SIZE) * GRID_SIZE : value;
+    }
+
+    canvas.on('mouse:down', (o) => {
+        const pointer = canvas.getPointer(o.e);
+        const snappedPointer = { x: snap(pointer.x), y: snap(pointer.y) };
+        
+        if (currentMode !== 'select') {
+            isDrawing = true;
+            startPoint = snappedPointer;
+            
+            if (currentMode === 'wall') { // 'wall' uses line for now
+                activeShape = new fabric.Line([startPoint.x, startPoint.y, startPoint.x, startPoint.y], {
+                    stroke: '#333333', strokeWidth: 5, selectable: false
+                });
+            } else if (currentMode === 'rect') {
+                activeShape = new fabric.Rect({
+                    left: startPoint.x, top: startPoint.y, width: 0, height: 0,
+                    stroke: '#333333', strokeWidth: 2, fill: 'rgba(66, 133, 244, 0.1)', selectable: false
+                });
             }
+            if(activeShape) canvas.add(activeShape);
         }
     });
 
-    // --- Responsive Canvas ---
-    window.addEventListener('resize', () => {
-        canvas.setWidth(canvasContainer.offsetWidth - 40);
-        canvas.setHeight(canvasContainer.offsetHeight - 40);
-        canvas.renderAll();
+    canvas.on('mouse:move', (o) => {
+        const pointer = canvas.getPointer(o.e);
+        const snappedPointer = { x: snap(pointer.x), y: snap(pointer.y) };
+        coordsDisplay.innerText = `X: ${(pointer.x / PIXELS_PER_METER).toFixed(2)}m, Y: ${(pointer.y / PIXELS_PER_METER).toFixed(2)}m`;
+        
+        if (isDrawing && activeShape) {
+            if (currentMode === 'wall') {
+                activeShape.set({ x2: snappedPointer.x, y2: snappedPointer.y });
+            } else if (currentMode === 'rect') {
+                activeShape.set({
+                    width: Math.abs(snappedPointer.x - startPoint.x),
+                    height: Math.abs(snappedPointer.y - startPoint.y),
+                    left: snappedPointer.x > startPoint.x ? startPoint.x : snappedPointer.x,
+                    top: snappedPointer.y > startPoint.y ? startPoint.y : snappedPointer.y
+                });
+            }
+            canvas.renderAll();
+        }
     });
 
+    canvas.on('mouse:up', () => {
+        if (isDrawing) {
+            isDrawing = false;
+            if(activeShape) activeShape.set('selectable', true);
+            setMode('select');
+        }
+    });
+
+    // --- 6. EVENT LISTENERS ---
+    canvas.on({
+        'selection:created': (e) => updatePropertiesPanel(e.target),
+        'selection:updated': (e) => updatePropertiesPanel(e.target),
+        'selection:cleared': () => updatePropertiesPanel(null),
+        'object:modified': (e) => updatePropertiesPanel(e.target),
+    });
+    
+    document.getElementById('select-tool-btn').addEventListener('click', () => setMode('select'));
+    document.getElementById('wall-tool-btn').addEventListener('click', () => setMode('wall'));
+    document.getElementById('rect-tool-btn').addEventListener('click', () => setMode('rect'));
+    document.getElementById('asset-tool-btn').addEventListener('click', () => setMode('asset'));
+    
+    window.addEventListener('resize', () => {
+        canvas.setWidth(canvasContainer.offsetWidth);
+        canvas.setHeight(canvasContainer.offsetHeight);
+        canvas.clear();
+        drawGrid();
+    });
+
+    // --- 7. ASSET LOADING (Simplified) ---
+    const assetFiles = ['sofa.svg', 'chair.svg', 'table.svg'];
+    const assetList = document.getElementById('asset-list');
+    assetFiles.forEach(file => {
+        const item = document.createElement('div');
+        item.className = 'asset-item';
+        item.innerHTML = `<img src="assets/furniture/${file}" />`;
+        item.addEventListener('click', () => {
+             fabric.loadSVGFromURL(`assets/furniture/${file}`, (objects, options) => {
+                const obj = fabric.util.groupSVGElements(objects, options);
+                obj.set({ left: canvas.width / 2, top: canvas.height / 2 }).scaleToWidth(PIXELS_PER_METER * 1.5); // ~1.5m wide
+                canvas.add(obj);
+                setMode('select');
+            });
+        });
+        assetList.appendChild(item);
+    });
+
+    // --- 8. INITIALIZATION ---
+    drawGrid();
+    setMode('select');
 });
