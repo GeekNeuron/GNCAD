@@ -1,155 +1,88 @@
-/* Google Fonts for a modern look */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
 
-/* CSS Variables for Theming */
 :root {
-    --font-primary: 'Roboto', sans-serif;
-    --font-header: 'Orbitron', sans-serif;
+    --bg-main: #f0f2f5;
+    --bg-panels: #ffffff;
+    --bg-canvas: #e9e9e9;
+    --text-primary: #1a1a1a;
+    --text-secondary: #5f6368;
+    --accent-primary: #4285f4;
+    --accent-secondary: #e0e0e0;
+    --border-color: #dadce0;
+    --shadow: 0 1px 3px rgba(0,0,0,0.1);
+    --font-family: 'Inter', sans-serif;
 }
 
-.dark-theme {
-    --bg-color: #1a1a2e;
-    --bg-panel: #16213e;
-    --header-bg: #0f3460;
-    --text-color: #e94560;
-    --text-muted: #c0c0c0;
-    --border-color: #e94560;
-    --canvas-bg: #2a2a3e;
-    --button-bg: #e94560;
-    --button-text: #ffffff;
-}
-
-.light-theme {
-    --bg-color: #f0f2f5;
-    --bg-panel: #ffffff;
-    --header-bg: #4a90e2;
-    --text-color: #333333;
-    --text-muted: #555555;
-    --border-color: #4a90e2;
-    --canvas-bg: #e9e9e9;
-    --button-bg: #4a90e2;
-    --button-text: #ffffff;
-}
-
-/* General Styles */
+/* Basic Reset */
+* { box-sizing: border-box; }
 body {
     margin: 0;
-    font-family: var(--font-primary);
-    background-color: var(--bg-color);
-    color: var(--text-muted);
-    transition: background-color 0.3s, color 0.3s;
+    font-family: var(--font-family);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
     overflow: hidden;
+    -webkit-font-smoothing: antialiased;
 }
 
-#main-header {
-    background-color: var(--header-bg);
-    color: var(--text-color);
-    text-align: center;
-    padding: 5px;
-    font-family: var(--font-header);
-    cursor: pointer;
-    user-select: none;
-    border-bottom: 2px solid var(--border-color);
-}
-
-#editor-container {
-    display: flex;
-    height: calc(100vh - 60px);
-}
-
-/* Panels (Assets & Toolbar) */
-#asset-panel, #toolbar {
-    width: 200px;
-    background-color: var(--bg-panel);
-    padding: 15px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-}
-
-#asset-panel {
-    border-right: 2px solid var(--border-color);
-}
-
-#toolbar {
-    border-left: 2px solid var(--border-color);
-}
-
-h2 {
-    color: var(--text-color);
-    font-family: var(--font-header);
-    margin-top: 0;
-    text-align: center;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--border-color);
-}
-
-/* Asset List */
-#asset-list {
+#app-container {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: 60px 1fr 280px;
+    grid-template-rows: 50px 1fr 30px;
+    grid-template-areas:
+        "header header header"
+        "toolbar canvas panel"
+        "footer footer footer";
+    height: 100vh;
 }
 
-.asset-item {
-    background-color: var(--canvas-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 5px;
-    padding: 10px;
+/* Layout Areas */
+#app-header { grid-area: header; background: var(--bg-panels); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; padding: 0 20px; }
+#left-toolbar { grid-area: toolbar; background: var(--bg-panels); border-right: 1px solid var(--border-color); padding-top: 10px; }
+#canvas-container { grid-area: canvas; background: var(--bg-main); display: flex; align-items: center; justify-content: center; }
+#right-panel { grid-area: panel; background: var(--bg-panels); border-left: 1px solid var(--border-color); padding: 20px; }
+#status-bar { grid-area: footer; background: var(--bg-panels); border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; padding: 0 20px; font-size: 12px; color: var(--text-secondary); }
+
+h1 { font-size: 20px; color: var(--accent-primary); }
+h3 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; color: var(--text-primary); }
+
+/* Left Toolbar */
+#left-toolbar { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.tool-btn {
+    background: none;
+    border: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.2s, background-color 0.2s;
-}
-
-.asset-item:hover {
-    transform: scale(1.1);
-    background-color: var(--bg-color);
-}
-
-.asset-item img {
-    width: 100%;
-    height: auto;
-    filter: invert(80%); /* Makes SVG icons visible on dark backgrounds */
-}
-
-/* Main Canvas Area */
-#canvas-container {
-    flex-grow: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    color: var(--text-secondary);
+    transition: background-color 0.2s;
 }
+.tool-btn:hover { background-color: var(--accent-secondary); }
+.tool-btn.active { background-color: #d3e3fd; color: var(--accent-primary); }
+.material-symbols-outlined { font-size: 24px; }
 
-canvas {
-    border: 1px dashed var(--border-color);
-    border-radius: 5px;
-}
-
-/* Toolbar items */
-.tool-group {
-    margin-bottom: 20px;
-}
-.tool-group h3 {
-    color: var(--text-muted);
-    border-bottom: 1px solid var(--text-muted);
-    padding-bottom: 5px;
-}
-
-button {
+/* Right Panel */
+#panel-content-placeholder { color: var(--text-secondary); font-size: 14px; text-align: center; margin-top: 20px; }
+.hidden { display: none !important; }
+.prop-item { margin-bottom: 15px; }
+.prop-item label { display: block; font-size: 12px; margin-bottom: 5px; color: var(--text-secondary); }
+.prop-item input {
     width: 100%;
-    padding: 10px;
-    margin-top: 10px;
-    background-color: var(--button-bg);
-    color: var(--button-text);
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: var(--font-primary);
-    font-weight: bold;
-    transition: opacity 0.2s;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 14px;
 }
+.prop-item input:disabled { background: var(--bg-main); }
 
-button:hover {
-    opacity: 0.9;
-}
+/* Asset Panel (inside Right Panel) */
+#asset-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.asset-item { border: 1px solid var(--border-color); border-radius: 4px; padding: 10px; cursor: pointer; transition: box-shadow 0.2s; }
+.asset-item:hover { box-shadow: 0 0 0 2px var(--accent-primary); }
+.asset-item img { width: 100%; height: auto; }
+
+/* Status Bar */
+#snap-toggle { display: flex; align-items: center; gap: 5px; }
