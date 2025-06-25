@@ -3,40 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GNCAD</title>
+    <title>GNCAD - Modern CAD Environment</title>
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="dark-theme">
+<body>
 
-    <header id="main-header">
-        <h1>GNCAD</h1>
-    </header>
+    <div id="app-container">
+        
+        <header id="app-header">
+            <h1>GNCAD</h1>
+            </header>
 
-    <div id="editor-container">
-        <aside id="asset-panel">
-            <h2>Assets</h2>
-            <div id="asset-list">
-                </div>
+        <aside id="left-toolbar">
+            <button class="tool-btn" id="select-tool-btn" title="Select (V)">
+                <span class="material-symbols-outlined">pan_tool</span>
+            </button>
+            <button class="tool-btn" id="wall-tool-btn" title="Draw Wall (L)">
+                <span class="material-symbols-outlined">line_start</span>
+            </button>
+            <button class="tool-btn" id="rect-tool-btn" title="Draw Room (R)">
+                <span class="material-symbols-outlined">check_box_outline_blank</span>
+            </button>
+             <button class="tool-btn" id="asset-tool-btn" title="Place Furniture (A)">
+                <span class="material-symbols-outlined">chair</span>
+            </button>
         </aside>
 
         <main id="canvas-container">
             <canvas id="gn-canvas"></canvas>
         </main>
 
-        <aside id="toolbar">
-            <h2>Tools</h2>
-            <div class="tool-group">
-                <h3>Export</h3>
-                <button id="export-jpg-btn">Export as JPG</button>
-                <button id="export-dxf-btn">Export as DXF</button>
+        <aside id="right-panel">
+            <div id="properties-panel">
+                <h3>Properties</h3>
+                <div id="panel-content-placeholder">Select an object to see its properties.</div>
+                <div id="panel-content-dynamic" class="hidden">
+                    <div class="prop-item">
+                        <label for="prop-width">Width (m)</label>
+                        <input type="number" id="prop-width" step="0.01">
+                    </div>
+                    <div class="prop-item">
+                        <label for="prop-height">Height (m)</label>
+                        <input type="number" id="prop-height">
+                    </div>
+                    <div class="prop-item">
+                        <label for="prop-area">Area (m²)</label>
+                        <input type="text" id="prop-area" disabled>
+                    </div>
+                </div>
+            </div>
+             <div id="asset-panel-container" class="hidden">
+                <h3>Assets</h3>
+                <div id="asset-list">
+                    </div>
             </div>
         </aside>
+
+        <footer id="status-bar">
+            <div id="coords-display">X: 0.00, Y: 0.00</div>
+            <div id="zoom-display">Zoom: 100%</div>
+            <div id="snap-toggle">
+                <input type="checkbox" id="snap-checkbox" checked>
+                <label for="snap-checkbox">Snap to Grid</label>
+            </div>
+        </footer>
+
     </div>
 
     <script src="lib/fabric.min.js"></script>
-    
-    <script src="js/dxf-exporter.js"></script>
     <script src="js/main.js"></script>
-
-</body>
+    </body>
 </html>
