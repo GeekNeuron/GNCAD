@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GNCAD - Final Professional Edition</title>
+    <title>GNCAD - Final Polished Edition</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <link rel="stylesheet" href="css/style.css">
@@ -14,18 +14,7 @@
         <header id="app-header">
             <h1>GNCAD</h1>
             <div id="header-actions">
-                <div class="dropdown">
-                    <button id="file-menu-btn" class="header-btn">File</button>
-                    <div id="file-menu-dropdown" class="dropdown-content">
-                        <a href="#" id="new-btn">New Canvas</a>
-                        <a href="#" id="save-btn">Save Project</a>
-                        <a href="#" id="load-btn">Load Project</a>
-                        <a href="#" id="import-dxf-btn">Import DXF...</a>
-                        <hr>
-                        <a href="#" id="export-btn">Export Image...</a>
-                        <a href="#" id="export-dxf-btn">Export as DXF</a>
-                    </div>
-                </div>
+                <div class="dropdown"><button id="file-menu-btn" class="header-btn">File</button><div id="file-menu-dropdown" class="dropdown-content"><a href="#" id="new-btn">New Canvas</a><a href="#" id="save-btn">Save Project</a><a href="#" id="load-btn">Load Project</a><a href="#" id="import-dxf-btn">Import DXF...</a><hr><a href="#" id="export-btn">Export Image...</a><a href="#" id="export-dxf-btn">Export as DXF</a></div></div>
                 <button id="undo-btn" class="header-btn" title="Undo (Ctrl+Z)" disabled><span class="material-symbols-outlined">undo</span></button>
                 <button id="redo-btn" class="header-btn" title="Redo (Ctrl+Y)" disabled><span class="material-symbols-outlined">redo</span></button>
                 <input type="file" id="file-input" accept=".gncad" class="hidden">
@@ -33,10 +22,10 @@
             </div>
         </header>
 
+        <div id="ruler-corner"></div>
         <div id="ruler-top-container"><canvas id="ruler-top"></canvas></div>
         <div id="ruler-left-container"><canvas id="ruler-left"></canvas></div>
-        <div id="ruler-corner"></div>
-
+        
         <aside id="left-toolbar">
             <button class="tool-btn" id="select-tool-btn" title="Select (V)"><span class="material-symbols-outlined">pan_tool</span></button>
             <div id="wall-tool-container">
@@ -47,6 +36,9 @@
             <button class="tool-btn" id="door-tool-btn" title="Place Door (P)"><span class="material-symbols-outlined">door_open</span></button>
             <button class="tool-btn" id="window-tool-btn" title="Place Window (W)"><span class="material-symbols-outlined">window</span></button>
             <button class="tool-btn" id="stairs-tool-btn" title="Draw Stairs (S)"><span class="material-symbols-outlined">stairs</span></button>
+            <button class="tool-btn" id="mirror-tool-btn" title="Mirror (M)"><span class="material-symbols-outlined">flip</span></button>
+            <button class="tool-btn" id="offset-tool-btn" title="Offset (O)"><span class="material-symbols-outlined">filter_drama</span></button>
+            <button class="tool-btn" id="trim-tool-btn" title="Trim (T)"><span class="material-symbols-outlined">content_cut</span></button>
             <button class="tool-btn" id="dimension-tool-btn" title="Dimension (D)"><span class="material-symbols-outlined">straighten</span></button>
             <button class="tool-btn" id="asset-tool-btn" title="Place Furniture (A)"><span class="material-symbols-outlined">chair</span></button>
         </aside>
