@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const PIXELS_PER_METER = 40;
     const GRID_SIZE = PIXELS_PER_METER / 2;
     const HISTORY_LIMIT = 50;
+    const ROOM_FILL_COLORS = ['rgba(141, 206, 255, 0.4)', 'rgba(255, 183, 137, 0.4)', 'rgba(131, 232, 163, 0.4)', 'rgba(255, 243, 128, 0.4)', 'rgba(221, 160, 221, 0.4)'];
+let roomColorIndex = 0;
+    const SNAP_DISTANCE = 10;
 
     // 2. STATE VARIABLES
     let currentMode = 'select';
@@ -273,13 +276,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderPolylineProperties(obj) {
-        let totalLength = 0;
-        obj._objects.filter(o => o.type === 'line').forEach(line => {
-            totalLength += line.getScaledWidth();
-        });
-        const lengthMeters = (totalLength / PIXELS_PER_METER).toFixed(2);
-        createPropItem('Total Length', lengthMeters, 'm');
+    let totalLength = 0;
+    if (obj.points) { 
+        for (let i = 0; i < obj.points.length - 1; i++) {
+            totalLength += new fabric.Point(obj.points[i].x, obj.points[i].y)
+                .distanceFrom(new fabric.Point(obj.points[i + 1].x, obj.points[i + 1].y));
+        }
     }
+    const lengthMeters = (totalLength / PIXELS_PER_METER).toFixed(2);
+    createPropItem('Total Length', lengthMeters, 'm');
+}
 
     function renderDimensionProperties(obj) {
         const textObject = obj._objects.find(o => o.type === 'text');
@@ -320,41 +326,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
                           // 7. CORE DRAWING & SYMBOL CREATION
     function createDoorSymbol(x, y, angle = 0, width = PIXELS_PER_METER * 0.8) {
-        const doorLeaf = new fabric.Rect({ left: 0, top: 0, width: width, height: 5, fill: 'var(--bg-panels)', stroke: 'var(--text-primary)', strokeWidth: 2, originX: 'left', originY: 'top' });
-        const arcPath = `M 0 5 A ${width - 5} ${width - 5} 0 0 1 ${width} 5`;
-        const doorSwing = new fabric.Path(arcPath, { fill: 'transparent', stroke: 'var(--text-secondary)', strokeDashArray: [5, 5], strokeWidth: 1 });
-        const doorGroup = new fabric.Group([doorLeaf, doorSwing], { left: x, top: y, angle: angle, selectable: true, originX: 'left', originY: 'center', data: { layer: 'furniture', type: 'door' } });
-        canvas.add(doorGroup);
-        return doorGroup;
-    }
+    const wallThickness = currentStrokeWidth;
+    const bgColor = getComputedStyle(document.body).getPropertyValue('--bg-canvas-container').trim();
+    const doorMask = new fabric.Rect({ width: width, height: wallThickness, fill: bgColor, originX: 'center', originY: 'center' });
+    const doorLeaf = new fabric.Rect({ left: -width/2, top: 0, width: width, height: 3, fill: 'transparent', stroke: 'var(--text-primary)', strokeWidth: 1.5, originX: 'left', originY: 'center' });
+    const arcPath = `M ${-width/2} 0 A ${width} ${width} 0 0 1 ${width/2} ${-width}`;
+    const doorSwing = new fabric.Path(arcPath, { fill: 'transparent', stroke: 'var(--text-secondary)', strokeDashArray: [3, 3], strokeWidth: 1, originX: 'left', originY: 'bottom' });
+    const doorGroup = new fabric.Group([doorMask, doorLeaf, doorSwing], { left: x, top: y, angle: angle, selectable: true, originX: 'center', originY: 'center', data: { layer: 'furniture', type: 'door' } });
+    canvas.add(doorGroup);
+    return doorGroup;
+}
 
     function createWindowSymbol(x, y, angle = 0, width = PIXELS_PER_METER * 1.2) {
-        const wallThickness = 5;
-        const line1 = new fabric.Line([-width / 2, -wallThickness, width / 2, -wallThickness], { stroke: 'var(--text-primary)', strokeWidth: 2 });
-        const line2 = new fabric.Line([-width / 2, 0, width / 2, 0], { stroke: 'var(--text-primary)', strokeWidth: 1 });
-        const line3 = new fabric.Line([-width / 2, wallThickness, width / 2, wallThickness], { stroke: 'var(--text-primary)', strokeWidth: 2 });
-        const windowGroup = new fabric.Group([line1, line2, line3], { left: x, top: y, angle: angle, selectable: true, originX: 'center', originY: 'center', data: { layer: 'furniture', type: 'window', width: width } });
-        canvas.add(windowGroup);
-        return windowGroup;
-    }
+    const wallThickness = currentStrokeWidth;
+    const bgColor = getComputedStyle(document.body).getPropertyValue('--bg-canvas-container').trim();
+    const windowMask = new fabric.Rect({ width: width, height: wallThickness, fill: bgColor, originX: 'center', originY: 'center' });
+    const frameLine = new fabric.Line([-width / 2, 0, width / 2, 0], { stroke: 'var(--text-primary)', strokeWidth: wallThickness });
+    const glassLine = new fabric.Line([-width / 2, 0, width / 2, 0], { stroke: '#87CEEB', strokeWidth: wallThickness - 3 < 1 ? 1 : wallThickness - 3 });
+    const windowGroup = new fabric.Group([windowMask, frameLine, glassLine], { left: x, top: y, angle: angle, selectable: true, originX: 'center', originY: 'center', data: { layer: 'furniture', type: 'window', width: width } });
+    canvas.add(windowGroup);
+    return windowGroup;
+}
 
     function createStairsSymbol(x, y, width, height, angle = 0) {
-        const items = [];
-        const stepCount = Math.max(1, Math.floor(height / (PIXELS_PER_METER * 0.3)));
-        const stepDepth = height / stepCount;
-        const outline = new fabric.Rect({ width: width, height: height, stroke: 'var(--text-primary)', strokeWidth: 2, fill: 'transparent' });
-        items.push(outline);
-        for (let i = 1; i < stepCount; i++) {
-            items.push(new fabric.Line([0, i * stepDepth, width, i * stepDepth], { stroke: 'var(--text-secondary)', strokeWidth: 1 }));
-        }
-        const directionLine = new fabric.Line([width / 2, height - (stepDepth/2), width / 2, stepDepth / 2], { stroke: 'var(--text-primary)', strokeWidth: 1 });
-        items.push(directionLine);
-        const arrowHead = new fabric.Triangle({ width: 10, height: 15, fill: 'var(--text-primary)', left: width / 2, top: stepDepth / 2, originX: 'center', originY: 'bottom', angle: 180 });
-        items.push(arrowHead);
-        const stairsGroup = new fabric.Group(items, { left: x, top: y, angle: angle, originX: 'left', originY: 'top', selectable: true, data: { layer: 'furniture', type: 'stairs' } });
-        canvas.add(stairsGroup);
-        return stairsGroup;
+    const items = [];
+    const stepCount = Math.max(2, Math.floor(height / (PIXELS_PER_METER * 0.3)));
+    const stepDepth = height / stepCount;
+    const outline = new fabric.Rect({ width: width, height: height, stroke: 'var(--text-primary)', strokeWidth: 2, fill: 'var(--bg-panels)', originX: 'center', originY: 'center' });
+    items.push(outline);
+    for (let i = 1; i < stepCount; i++) {
+        items.push(new fabric.Line([ -width/2, -height/2 + i * stepDepth, width/2, -height/2 + i * stepDepth], { stroke: 'var(--text-secondary)', strokeWidth: 1 }));
     }
+    const directionLine = new fabric.Line([0, height/2 - (stepDepth/2), 0, -height/2 + stepDepth / 2], { stroke: 'var(--text-primary)', strokeWidth: 1 });
+    items.push(directionLine);
+    const arrowHead = new fabric.Triangle({ width: 10, height: 15, fill: 'var(--text-primary)', left: 0, top: -height/2 + stepDepth / 2, originX: 'center', originY: 'bottom', angle: 180 });
+    items.push(arrowHead);
+    const stairsGroup = new fabric.Group(items, { left: x, top: y, angle: angle, originX: 'left', originY: 'top', selectable: true, data: { layer: 'furniture', type: 'stairs' } });
+    canvas.add(stairsGroup);
+    return stairsGroup;
+}
     
     function createDimensionObject(p1, p2) {
         const distancePixels = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
@@ -370,26 +380,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function finalizeWall() {
-        if (wallPoints.length > 1) {
-            const finalWall = new fabric.Polyline(wallPoints, {
-                stroke: 'var(--text-primary)',
-                strokeWidth: currentStrokeWidth,
-                fill: null,
-                selectable: true,
-                data: { layer: 'walls', type: 'wall-system' },
-                objectCaching: false
-            });
-            canvas.add(finalWall);
-        }
-        canvas.getObjects().forEach(obj => { if (obj.name === 'temp') canvas.remove(obj); });
-        if (tempWallLine) canvas.remove(tempWallLine);
-        wallPoints = [];
-        tempWallLine = null;
-        isDrawing = false;
-        toolTip.innerText = '';
-        setMode('select');
-        canvas.renderAll();
+    if (wallPoints.length > 1) {
+        const finalWall = new fabric.Polyline(wallPoints, {
+            stroke: 'var(--text-primary)',
+            strokeWidth: currentStrokeWidth,
+            fill: null,
+            selectable: true,
+            data: { layer: 'walls', type: 'wall-system' },
+            objectCaching: false,
+            strokeLineJoin: 'miter' // خط جدید
+        });
+        canvas.add(finalWall);
     }
+
+    // حذف تمام اشیاء موقتی
+    canvas.getObjects().forEach(obj => {
+        if (obj.name === 'temp') {
+            canvas.remove(obj);
+        }
+    });
+
+    if (tempWallLine) canvas.remove(tempWallLine);
+    wallPoints = [];
+    tempWallLine = null;
+    isDrawing = false;
+    toolTip.innerText = '';
+    setMode('select');
+    canvas.renderAll();
+}
     
     function updateRoomDimensions(roomGroup) {
         const rect = roomGroup._objects.find(o => o.type === 'rect');
