@@ -13,8 +13,10 @@
             <h1>GNCAD</h1>
             <div id="header-actions">
                 <div class="dropdown"><button id="file-menu-btn" class="header-btn">File</button><div id="file-menu-dropdown" class="dropdown-content"><a href="#" id="new-btn">New Canvas</a><a href="#" id="save-btn">Save Project</a><a href="#" id="load-btn">Load Project</a><a href="#" id="import-dxf-btn">Import DXF...</a><hr><a href="#" id="export-btn">Export Image...</a><a href="#" id="export-dxf-btn">Export as DXF</a></div></div>
+                <button id="theme-toggle-btn" class="header-btn" title="Toggle Theme"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg></button>
                 <button id="undo-btn" class="header-btn" title="Undo (Ctrl+Z)" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" /></svg></button>
                 <button id="redo-btn" class="header-btn" title="Redo (Ctrl+Y)" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l4 -4l-4 -4" /><path d="M19 10h-11a4 4 0 1 0 0 8h1" /></svg></button>
+                <button id="panel-toggle-btn" class="header-btn" title="Toggle Panel"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2l0 -12" /><path d="M15 4l0 16" /></svg></button>
                 <input type="file" id="file-input" accept=".gncad" class="hidden">
                 <input type="file" id="dxf-file-input" accept=".dxf" class="hidden">
             </div>
@@ -46,6 +48,7 @@
             <canvas id="crosshair-canvas"></canvas>
         </main>
 
+        <div id="panel-backdrop"></div>
         <aside id="right-panel">
             <div id="layers-panel"><h3>Layers</h3><ul id="layer-list">
                 <li class="layer-item" data-layer="walls"><span>Walls</span><span class="visibility-toggle" data-visible="true"></span></li>

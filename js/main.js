@@ -5,6 +5,8 @@ import { createDoorSymbol as createDoorSymbolBase, createWindowSymbol as createW
 
 const ICON_SVG_OPEN = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
 const ICON_EYE = ICON_SVG_OPEN + '<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" /><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" /></svg>';
+const ICON_SUN = ICON_SVG_OPEN + '<path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg>';
+const ICON_MOON = ICON_SVG_OPEN + '<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008" /></svg>';
 const ICON_EYE_OFF = ICON_SVG_OPEN + '<path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" /></svg>';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -72,7 +74,6 @@ let roomColorIndex = 0;
     const importDxfBtn = document.getElementById('import-dxf-btn');
     const exportDxfBtn = document.getElementById('export-dxf-btn');
     const dxfFileInput = document.getElementById('dxf-file-input');
-    const appHeader = document.getElementById('app-header');
 
     const rulerTopCtx = rulerTopCanvas.getContext('2d');
     const rulerLeftCtx = rulerLeftCanvas.getContext('2d');
@@ -219,15 +220,25 @@ let roomColorIndex = 0;
         const labelEl = document.createElement('label');
         labelEl.innerText = label;
         propItem.appendChild(labelEl);
+        const inputWrap = document.createElement('div');
+        inputWrap.className = 'prop-input-wrap';
         const inputEl = document.createElement('input');
         inputEl.type = isEditable ? 'number' : 'text';
-        inputEl.value = value;
-        if (!isEditable) inputEl.disabled = true;
-        if (unit) inputEl.value += ` ${unit}`;
-        if (isEditable && onchange) {
-            inputEl.addEventListener('change', (e) => onchange(parseFloat(e.target.value) || 0));
+        if (isEditable) {
+            inputEl.value = value;
+            if (onchange) inputEl.addEventListener('change', (e) => onchange(parseFloat(e.target.value) || 0));
+        } else {
+            inputEl.value = unit ? `${value} ${unit}` : value;
+            inputEl.disabled = true;
         }
-        propItem.appendChild(inputEl);
+        inputWrap.appendChild(inputEl);
+        if (isEditable && unit) {
+            const unitEl = document.createElement('span');
+            unitEl.className = 'prop-unit';
+            unitEl.innerText = unit;
+            inputWrap.appendChild(unitEl);
+        }
+        propItem.appendChild(inputWrap);
         panelContent.appendChild(propItem);
     }
 
@@ -714,6 +725,7 @@ let roomColorIndex = 0;
                 }
             }
         }
+        if (currentMode === 'select') updatePropertiesPanel(canvas.getActiveObject());
     });
 
     canvas.on('mouse:dblclick', () => { if (currentMode === 'wall') finalizeWall(); });
@@ -793,13 +805,30 @@ let roomColorIndex = 0;
         const file = e.target.files[0]; if (!file) return;
         importDxf(fabric, canvas, cssVar, file, () => saveState());
     });
-    appHeader.addEventListener('click', (e) => {
-        if (e.target.id === 'app-header' || e.target.tagName === 'H1') {
-            document.body.classList.toggle('light-theme');
-            document.body.classList.toggle('dark-theme');
-            canvas.backgroundColor = createGridPattern(); canvas.renderAll(); drawRulers();
-        }
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    function syncThemeIcon() {
+        themeToggleBtn.innerHTML = document.body.classList.contains('dark-theme') ? ICON_MOON : ICON_SUN;
+    }
+    syncThemeIcon();
+    themeToggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('light-theme');
+        document.body.classList.toggle('dark-theme');
+        syncThemeIcon();
+        canvas.backgroundColor = createGridPattern(); canvas.renderAll(); drawRulers();
     });
+    const rightPanel = document.getElementById('right-panel');
+    const panelToggleBtn = document.getElementById('panel-toggle-btn');
+    const panelBackdrop = document.getElementById('panel-backdrop');
+    function closePanel() {
+        rightPanel.classList.remove('panel-open');
+        panelBackdrop.classList.remove('visible');
+    }
+    panelToggleBtn.addEventListener('click', () => {
+        rightPanel.classList.toggle('panel-open');
+        panelBackdrop.classList.toggle('visible', rightPanel.classList.contains('panel-open'));
+    });
+    panelBackdrop.addEventListener('click', closePanel);
+
     showRulersCheckbox.addEventListener('change', () => {
         drawRulers();
         drawCrosshairs(lastMousePos);
@@ -848,6 +877,8 @@ let roomColorIndex = 0;
             { id: 'tv', name: 'TV', file: 'tv.svg', sizeMeters: 1.0 },
             { id: 'bookshelf', name: 'Bookshelf', file: 'bookshelf.svg', sizeMeters: 1.0 },
             { id: 'rug', name: 'Rug', file: 'rug.svg', sizeMeters: 2.0 },
+            { id: 'floor-lamp', name: 'Floor Lamp', file: 'floor-lamp.svg', sizeMeters: 0.4 },
+            { id: 'piano', name: 'Piano', file: 'piano.svg', sizeMeters: 1.5 },
         ],
         'Bedroom': [
             { id: 'bed', name: 'Bed', file: 'bed.svg', sizeMeters: 2.0 },
@@ -855,6 +886,7 @@ let roomColorIndex = 0;
             { id: 'nightstand', name: 'Nightstand', file: 'nightstand.svg', sizeMeters: 0.5 },
             { id: 'dresser', name: 'Dresser', file: 'dresser.svg', sizeMeters: 1.2 },
             { id: 'mirror', name: 'Mirror', file: 'mirror.svg', sizeMeters: 0.8 },
+            { id: 'coat-rack', name: 'Coat Rack', file: 'coat-rack.svg', sizeMeters: 0.4 },
         ],
         'Kitchen': [
             { id: 'table', name: 'Dining Table', file: 'table.svg', sizeMeters: 1.2 },
@@ -873,10 +905,19 @@ let roomColorIndex = 0;
             { id: 'sink-bathroom', name: 'Sink', file: 'sink-bathroom.svg', sizeMeters: 0.5 },
             { id: 'washing-machine', name: 'Washing Machine', file: 'washing-machine.svg', sizeMeters: 0.6 },
         ],
+        'Office': [
+            { id: 'desk', name: 'Desk', file: 'desk.svg', sizeMeters: 1.2 },
+            { id: 'office-chair', name: 'Office Chair', file: 'office-chair.svg', sizeMeters: 0.6 },
+            { id: 'computer', name: 'Computer', file: 'computer.svg', sizeMeters: 0.5 },
+            { id: 'printer', name: 'Printer', file: 'printer.svg', sizeMeters: 0.4 },
+        ],
         'Outdoor': [
             { id: 'plant', name: 'Plant', file: 'plant.svg', sizeMeters: 0.4 },
             { id: 'tree', name: 'Tree', file: 'tree.svg', sizeMeters: 2.0 },
             { id: 'umbrella', name: 'Umbrella', file: 'umbrella.svg', sizeMeters: 1.8 },
+            { id: 'pool', name: 'Swimming Pool', file: 'pool.svg', sizeMeters: 3.0 },
+            { id: 'bbq-grill', name: 'BBQ Grill', file: 'bbq-grill.svg', sizeMeters: 0.6 },
+            { id: 'garden-cart', name: 'Garden Cart', file: 'garden-cart.svg', sizeMeters: 0.6 },
         ],
     };
     const FURNITURE_ITEMS = Object.values(FURNITURE_CATALOG).flat();
@@ -896,7 +937,11 @@ let roomColorIndex = 0;
             el.className = 'asset-item';
             el.dataset.assetId = item.id;
             el.title = item.name;
-            el.innerHTML = `<img src="assets/furniture/${item.file}" alt="${item.name}" draggable="false">`;
+            el.innerHTML = `<div class="asset-icon"></div><span class="asset-label">${item.name}</span>`;
+            fetch(`assets/furniture/${item.file}`)
+                .then(res => res.text())
+                .then(svgText => { el.querySelector('.asset-icon').innerHTML = svgText; })
+                .catch(() => {});
             grid.appendChild(el);
         });
         assetList.appendChild(grid);
