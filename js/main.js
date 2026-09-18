@@ -8,6 +8,17 @@ const ICON_EYE = ICON_SVG_OPEN + '<path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" 
 const ICON_SUN = ICON_SVG_OPEN + '<path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg>';
 const ICON_MOON = ICON_SVG_OPEN + '<path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1 -8.313 -12.454l0 .008" /></svg>';
 const ICON_EYE_OFF = ICON_SVG_OPEN + '<path d="M10.585 10.587a2 2 0 0 0 2.829 2.828" /><path d="M16.681 16.673a8.717 8.717 0 0 1 -4.681 1.327c-3.6 0 -6.6 -2 -9 -6c1.272 -2.12 2.712 -3.678 4.32 -4.674m2.86 -1.146a9.055 9.055 0 0 1 1.82 -.18c3.6 0 6.6 2 9 6c-.666 1.11 -1.379 2.067 -2.138 2.87" /><path d="M3 3l18 18" /></svg>';
+const ICON_LOCK = ICON_SVG_OPEN + '<path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>';
+const ICON_LOCK_OPEN = ICON_SVG_OPEN + '<path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2l0 -6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M8 11v-5a4 4 0 0 1 8 0" /></svg>';
+const ICON_TRASH = ICON_SVG_OPEN + '<path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>';
+const ICON_ALIGN_LEFT = ICON_SVG_OPEN + '<path d="M4 4l0 16" /><path d="M8 11a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -2" /></svg>';
+const ICON_ALIGN_HCENTER = ICON_SVG_OPEN + '<path d="M12 4l0 5" /><path d="M12 15l0 5" /><path d="M6 11a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -2" /></svg>';
+const ICON_ALIGN_RIGHT = ICON_SVG_OPEN + '<path d="M20 4l0 16" /><path d="M4 11a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -2" /></svg>';
+const ICON_ALIGN_TOP = ICON_SVG_OPEN + '<path d="M4 4l16 0" /><path d="M9 10a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2l0 -8" /></svg>';
+const ICON_ALIGN_VCENTER = ICON_SVG_OPEN + '<path d="M4 12l5 0" /><path d="M15 12l5 0" /><path d="M9 8a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2l0 -8" /></svg>';
+const ICON_ALIGN_BOTTOM = ICON_SVG_OPEN + '<path d="M4 20l16 0" /><path d="M9 6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-2a2 2 0 0 1 -2 -2l0 -8" /></svg>';
+const ICON_STACK = ICON_SVG_OPEN + '<path d="M12 4l-8 4l8 4l8 -4l-8 -4" /><path d="M4 12l8 4l8 -4" /><path d="M4 16l8 4l8 -4" /></svg>';
+const ICON_RULER = ICON_SVG_OPEN + '<path d="M19.875 12c.621 0 1.125 .512 1.125 1.143v5.714c0 .631 -.504 1.143 -1.125 1.143h-15.875a1 1 0 0 1 -1 -1v-5.857c0 -.631 .504 -1.143 1.125 -1.143h15.75" /><path d="M9 12v2" /><path d="M6 12v3" /><path d="M12 12v3" /><path d="M18 12v3" /><path d="M15 12v2" /><path d="M3 3v4" /></svg>';
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -38,9 +49,13 @@ let roomColorIndex = 0;
     let startPoint = null;
     let activeShape = null;
     let dimensionFirstPoint = null;
+    let measureFirstPoint = null;
     let wallPoints = [];
     let tempWallLine = null;
     let lastMousePos = { x: 0, y: 0 };
+    let clipboardData = null;
+    let nudgeSaveTimer = null;
+    let arrayTargetObject = null;
 
     const canvasContainer = document.getElementById('canvas-container');
     const panelContent = document.getElementById('panel-content');
@@ -198,12 +213,13 @@ let roomColorIndex = 0;
 
     function updatePropertiesPanel(obj) {
         panelContent.innerHTML = '';
-        if (!obj || !obj.data) {
-            panelContent.appendChild(panelPlaceholder);
-            return;
-        }
+        if (!obj) { panelContent.appendChild(panelPlaceholder); return; }
+        if (obj.type === 'activeSelection') { renderMultiSelectionToolbar(obj); return; }
+        if (!obj.data) { panelContent.appendChild(panelPlaceholder); return; }
+
+        renderObjectToolbar(obj);
         const { layer, type } = obj.data;
-        
+
         if (type === 'room') renderRectProperties(obj);
         else if (type === 'wall-system') renderPolylineProperties(obj);
         else if (layer === 'dimensions') renderDimensionProperties(obj);
@@ -211,7 +227,109 @@ let roomColorIndex = 0;
         else if (type === 'window') renderWindowProperties(obj);
         else if (type === 'stairs') renderStairsProperties(obj);
         else if (layer === 'furniture') renderFurnitureProperties(obj);
-        else panelContent.appendChild(panelPlaceholder);
+        else if (type === 'user-group') renderGroupProperties(obj);
+    }
+
+    function setActiveAndSync(obj) {
+        canvas.setActiveObject(obj);
+        updatePropertiesPanel(obj);
+    }
+
+    function toggleObjectLock(obj) {
+        const locking = !obj.lockMovementX;
+        obj.set({ lockMovementX: locking, lockMovementY: locking, lockScalingX: locking, lockScalingY: locking, lockRotation: locking, hasControls: !locking });
+        canvas.renderAll();
+        saveState();
+        updatePropertiesPanel(obj);
+    }
+
+    function renderObjectToolbar(obj) {
+        const toolbar = document.createElement('div');
+        toolbar.className = 'panel-toolbar';
+        const locked = !!obj.lockMovementX;
+        const lockBtn = document.createElement('button');
+        lockBtn.className = 'panel-action-btn panel-action-btn-half';
+        lockBtn.title = locked ? 'Unlock' : 'Lock';
+        lockBtn.innerHTML = (locked ? ICON_LOCK : ICON_LOCK_OPEN) + `<span>${locked ? 'Unlock' : 'Lock'}</span>`;
+        lockBtn.addEventListener('click', () => toggleObjectLock(obj));
+        toolbar.appendChild(lockBtn);
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'panel-action-btn panel-action-btn-half panel-action-btn-danger';
+        deleteBtn.title = 'Delete';
+        deleteBtn.innerHTML = ICON_TRASH + '<span>Delete</span>';
+        deleteBtn.addEventListener('click', () => {
+            canvas.remove(obj);
+            canvas.discardActiveObject();
+            canvas.renderAll();
+            updatePropertiesPanel(null);
+            saveState();
+        });
+        toolbar.appendChild(deleteBtn);
+        panelContent.appendChild(toolbar);
+    }
+
+    function renderGroupProperties(obj) {
+        const hint = document.createElement('div');
+        hint.className = 'prop-hint';
+        hint.innerText = `Group of ${obj._objects ? obj._objects.length : 0} objects. Ctrl+Shift+G to ungroup.`;
+        panelContent.appendChild(hint);
+    }
+
+    function alignSelection(edge) {
+        const active = canvas.getActiveObject();
+        if (!active || active.type !== 'activeSelection') return;
+        const objects = active.getObjects();
+        const rects = objects.map(o => ({ obj: o, rect: o.getBoundingRect(true, true) }));
+        const minX = Math.min(...rects.map(r => r.rect.left));
+        const maxX = Math.max(...rects.map(r => r.rect.left + r.rect.width));
+        const minY = Math.min(...rects.map(r => r.rect.top));
+        const maxY = Math.max(...rects.map(r => r.rect.top + r.rect.height));
+        const centerX = (minX + maxX) / 2;
+        const centerY = (minY + maxY) / 2;
+        rects.forEach(({ obj: o, rect }) => {
+            let dx = 0, dy = 0;
+            if (edge === 'left') dx = minX - rect.left;
+            if (edge === 'right') dx = maxX - (rect.left + rect.width);
+            if (edge === 'hcenter') dx = centerX - (rect.left + rect.width / 2);
+            if (edge === 'top') dy = minY - rect.top;
+            if (edge === 'bottom') dy = maxY - (rect.top + rect.height);
+            if (edge === 'vcenter') dy = centerY - (rect.top + rect.height / 2);
+            o.set({ left: o.left + dx, top: o.top + dy });
+            o.setCoords();
+        });
+        active.addWithUpdate();
+        canvas.renderAll();
+        saveState();
+    }
+
+    function renderMultiSelectionToolbar(activeSelection) {
+        const toolbar = document.createElement('div');
+        toolbar.className = 'panel-toolbar';
+        [
+            ['left', ICON_ALIGN_LEFT, 'Align Left'],
+            ['hcenter', ICON_ALIGN_HCENTER, 'Align Center Horizontal'],
+            ['right', ICON_ALIGN_RIGHT, 'Align Right'],
+            ['top', ICON_ALIGN_TOP, 'Align Top'],
+            ['vcenter', ICON_ALIGN_VCENTER, 'Align Center Vertical'],
+            ['bottom', ICON_ALIGN_BOTTOM, 'Align Bottom'],
+        ].forEach(([edge, icon, title]) => {
+            const btn = document.createElement('button');
+            btn.className = 'panel-toolbar-btn';
+            btn.title = title;
+            btn.innerHTML = icon;
+            btn.addEventListener('click', () => alignSelection(edge));
+            toolbar.appendChild(btn);
+        });
+        panelContent.appendChild(toolbar);
+        const groupBtn = document.createElement('button');
+        groupBtn.className = 'panel-action-btn';
+        groupBtn.innerHTML = ICON_STACK + '<span>Group (Ctrl+G)</span>';
+        groupBtn.addEventListener('click', groupSelection);
+        panelContent.appendChild(groupBtn);
+        const hint = document.createElement('div');
+        hint.className = 'prop-hint';
+        hint.innerText = `${activeSelection.getObjects().length} objects selected.`;
+        panelContent.appendChild(hint);
     }
     
     function createPropItem(label, value, unit = '', isEditable = false, onchange = null) {
@@ -517,10 +635,10 @@ let roomColorIndex = 0;
                     data: { layer: 'walls', type: 'room' }
                 });
                 canvas.add(roomGroup);
-                canvas.setActiveObject(roomGroup);
+                setActiveAndSync(roomGroup);
             } else if (currentMode === 'stairs') {
                 const stairsGroup = createStairsSymbol(left, top, width, height, angle);
-                canvas.setActiveObject(stairsGroup);
+                setActiveAndSync(stairsGroup);
             }
         }
 
@@ -600,6 +718,12 @@ let roomColorIndex = 0;
         'selection:created': (e) => updatePropertiesPanel(e.target),
         'selection:updated': (e) => updatePropertiesPanel(e.target),
         'selection:cleared': () => updatePropertiesPanel(null),
+        'object:scaling': (e) => {
+            const target = e.target;
+            if (target.data && target.data.layer === 'furniture') {
+                target.set('scaleY', target.scaleX);
+            }
+        },
         'object:modified': (e) => {
             const target = e.target;
             if (target.data && target.data.type === 'room') {
@@ -657,6 +781,24 @@ let roomColorIndex = 0;
                 createDimensionObject(dimensionFirstPoint, snappedPointer);
                 dimensionFirstPoint = null;
                 setMode('select');
+            }
+            return;
+        }
+
+        if (currentMode === 'measure') {
+            if (!measureFirstPoint) {
+                canvas.getObjects().filter(o => o.name === 'temp').forEach(o => canvas.remove(o));
+                measureFirstPoint = snappedPointer;
+                canvas.add(new fabric.Circle({ radius: 3, fill: cssVar('--accent-primary'), left: measureFirstPoint.x - 3, top: measureFirstPoint.y - 3, selectable: false, evented: false, name: 'temp' }));
+                toolTip.innerText = 'Click the second point.';
+            } else {
+                const distPx = Math.hypot(snappedPointer.x - measureFirstPoint.x, snappedPointer.y - measureFirstPoint.y);
+                const distM = (distPx / PIXELS_PER_METER).toFixed(2);
+                canvas.getObjects().filter(o => o.name === 'temp').forEach(o => canvas.remove(o));
+                canvas.add(new fabric.Line([measureFirstPoint.x, measureFirstPoint.y, snappedPointer.x, snappedPointer.y], { stroke: cssVar('--accent-primary'), strokeWidth: 2, strokeDashArray: [6, 4], selectable: false, evented: false, name: 'temp' }));
+                canvas.renderAll();
+                toolTip.innerText = `Distance: ${distM} m — click to start a new measurement.`;
+                measureFirstPoint = null;
             }
             return;
         }
@@ -730,10 +872,97 @@ let roomColorIndex = 0;
 
     canvas.on('mouse:dblclick', () => { if (currentMode === 'wall') finalizeWall(); });
     
+    function copySelection() {
+        const active = canvas.getActiveObject();
+        if (!active) return;
+        active.clone((cloned) => { clipboardData = cloned; }, ['data']);
+    }
+
+    function pasteClipboard() {
+        if (!clipboardData) return;
+        clipboardData.clone((cloned) => {
+            canvas.discardActiveObject();
+            cloned.set({ left: cloned.left + GRID_SIZE, top: cloned.top + GRID_SIZE, evented: true });
+            if (cloned.type === 'activeSelection') {
+                cloned.canvas = canvas;
+                cloned.forEachObject((obj) => { obj.data = obj.data ? Object.assign({}, obj.data) : undefined; canvas.add(obj); });
+                cloned.setCoords();
+            } else {
+                cloned.data = clipboardData.data ? Object.assign({}, clipboardData.data) : undefined;
+                canvas.add(cloned);
+            }
+            setActiveAndSync(cloned);
+            canvas.renderAll();
+            saveState();
+        }, ['data']);
+    }
+
+    function duplicateSelection() {
+        const active = canvas.getActiveObject();
+        if (!active) return;
+        active.clone((cloned) => {
+            canvas.discardActiveObject();
+            cloned.set({ left: cloned.left + GRID_SIZE, top: cloned.top + GRID_SIZE, evented: true });
+            if (cloned.type === 'activeSelection') {
+                cloned.canvas = canvas;
+                cloned.forEachObject((obj) => { obj.data = obj.data ? Object.assign({}, obj.data) : undefined; canvas.add(obj); });
+                cloned.setCoords();
+            } else {
+                cloned.data = active.data ? Object.assign({}, active.data) : undefined;
+                canvas.add(cloned);
+            }
+            setActiveAndSync(cloned);
+            canvas.renderAll();
+            saveState();
+        }, ['data']);
+    }
+
+    function selectAllObjects() {
+        canvas.discardActiveObject();
+        const selectable = canvas.getObjects().filter(o => o.selectable !== false && o.evented !== false);
+        if (!selectable.length) { canvas.renderAll(); return; }
+        const sel = new fabric.ActiveSelection(selectable, { canvas });
+        setActiveAndSync(sel);
+        canvas.renderAll();
+    }
+
+    function groupSelection() {
+        const active = canvas.getActiveObject();
+        if (!active || active.type !== 'activeSelection') return;
+        const group = active.toGroup();
+        group.set('data', { type: 'user-group' });
+        canvas.requestRenderAll();
+        updatePropertiesPanel(group);
+        saveState();
+    }
+
+    function ungroupSelection() {
+        const active = canvas.getActiveObject();
+        if (!active || active.type !== 'group' || !active.data || active.data.type !== 'user-group') return;
+        active.toActiveSelection();
+        canvas.requestRenderAll();
+        updatePropertiesPanel(canvas.getActiveObject());
+        saveState();
+    }
+
     window.addEventListener('keydown', (e) => {
         const activeElement = document.activeElement;
         if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') return;
         if (e.code === 'Space') { e.preventDefault(); if (!canvas.isGrabMode) { canvas.isGrabMode = true; canvas.defaultCursor = 'grab'; canvas.selection = false; canvas.renderAll(); } return; }
+
+        if (e.ctrlKey || e.metaKey) {
+            const key = e.key.toLowerCase();
+            if (key === 'c') { e.preventDefault(); copySelection(); return; }
+            if (key === 'v') { e.preventDefault(); pasteClipboard(); return; }
+            if (key === 'd') { e.preventDefault(); duplicateSelection(); return; }
+            if (key === 'a') { e.preventDefault(); selectAllObjects(); return; }
+            if (key === 'g' && e.shiftKey) { e.preventDefault(); ungroupSelection(); return; }
+            if (key === 'g') { e.preventDefault(); groupSelection(); return; }
+            if (key === 'z') { e.preventDefault(); undo(); return; }
+            if (key === 'y') { e.preventDefault(); redo(); return; }
+            return;
+        }
+
         switch (e.key.toLowerCase()) {
             case 'v': setMode('select'); break;
             case 'l': setMode('wall'); break;
@@ -743,6 +972,10 @@ let roomColorIndex = 0;
             case 's': setMode('stairs'); break;
             case 'd': setMode('dimension'); break;
             case 'a': setMode('asset'); break;
+            case 'm': setMode('mirror'); break;
+            case 'o': setMode('offset'); break;
+            case 't': setMode('trim'); break;
+            case 'q': setMode('measure'); break;
         }
         if (e.key === 'Escape') {
              if (currentMode === 'wall') finalizeWall();
@@ -752,11 +985,31 @@ let roomColorIndex = 0;
              }
         }
         if (e.key === 'Delete' || e.key === 'Backspace') {
-            canvas.getActiveObjects().forEach(obj => canvas.remove(obj));
-            canvas.discardActiveObject().renderAll();
+            const actives = canvas.getActiveObjects();
+            if (actives.length) {
+                actives.forEach(obj => canvas.remove(obj));
+                canvas.discardActiveObject();
+                canvas.renderAll();
+                updatePropertiesPanel(null);
+                saveState();
+            }
         }
-        if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
-        if (e.ctrlKey && e.key === 'y') { e.preventDefault(); redo(); }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+            const active = canvas.getActiveObject();
+            if (active && currentMode === 'select') {
+                e.preventDefault();
+                const step = e.shiftKey ? GRID_SIZE : 1;
+                if (e.key === 'ArrowUp') active.top -= step;
+                if (e.key === 'ArrowDown') active.top += step;
+                if (e.key === 'ArrowLeft') active.left -= step;
+                if (e.key === 'ArrowRight') active.left += step;
+                active.setCoords();
+                canvas.renderAll();
+                drawRulers();
+                clearTimeout(nudgeSaveTimer);
+                nudgeSaveTimer = setTimeout(() => saveState(), 400);
+            }
+        }
     });
     
     window.addEventListener('keyup', (e) => {
@@ -789,6 +1042,90 @@ let roomColorIndex = 0;
     document.querySelectorAll('input[name="format"]').forEach((radio) => {
         radio.addEventListener('change', (e) => { qualityWrapper.style.display = e.target.value === 'jpeg' ? 'block' : 'none'; });
     });
+
+    const arrayModalOverlay = document.getElementById('array-modal-overlay');
+    const arrayModal = document.getElementById('array-modal');
+    const closeArrayModalBtn = document.getElementById('close-array-modal-btn');
+    const arrayLinearFields = document.getElementById('array-linear-fields');
+    const arrayPolarFields = document.getElementById('array-polar-fields');
+    const arrayApplyBtn = document.getElementById('array-apply-btn');
+
+    function openArrayModal() { arrayModalOverlay.classList.remove('hidden'); arrayModal.classList.remove('hidden'); }
+    function closeArrayModal() { arrayModalOverlay.classList.add('hidden'); arrayModal.classList.add('hidden'); }
+    closeArrayModalBtn.addEventListener('click', closeArrayModal);
+    arrayModalOverlay.addEventListener('click', closeArrayModal);
+    document.querySelectorAll('input[name="array-type"]').forEach((radio) => {
+        radio.addEventListener('change', (e) => {
+            const isLinear = e.target.value === 'linear';
+            arrayLinearFields.classList.toggle('hidden', !isLinear);
+            arrayPolarFields.classList.toggle('hidden', isLinear);
+        });
+    });
+
+    function generateLinearArray(source, count, direction, spacingM) {
+        const spacingPx = spacingM * PIXELS_PER_METER;
+        const created = [];
+        for (let i = 1; i < count; i++) {
+            source.clone((cloned) => {
+                cloned.set({
+                    left: source.left + (direction === 'horizontal' ? spacingPx * i : 0),
+                    top: source.top + (direction === 'vertical' ? spacingPx * i : 0),
+                    data: source.data ? Object.assign({}, source.data) : undefined
+                });
+                canvas.add(cloned);
+                created.push(cloned);
+                if (created.length === count - 1) {
+                    canvas.renderAll();
+                    saveState();
+                }
+            }, ['data']);
+        }
+    }
+
+    function generatePolarArray(source, count, totalAngle, radiusM) {
+        const radiusPx = radiusM * PIXELS_PER_METER;
+        const angleStep = totalAngle / count;
+        const startTheta = -Math.PI / 2;
+        const centerX = source.left - radiusPx * Math.cos(startTheta);
+        const centerY = source.top - radiusPx * Math.sin(startTheta);
+        const created = [];
+        for (let i = 1; i < count; i++) {
+            const theta = startTheta + (angleStep * i) * Math.PI / 180;
+            source.clone((cloned) => {
+                cloned.set({
+                    left: centerX + radiusPx * Math.cos(theta),
+                    top: centerY + radiusPx * Math.sin(theta),
+                    angle: (source.angle || 0) + angleStep * i,
+                    data: source.data ? Object.assign({}, source.data) : undefined
+                });
+                canvas.add(cloned);
+                created.push(cloned);
+                if (created.length === count - 1) {
+                    canvas.renderAll();
+                    saveState();
+                }
+            }, ['data']);
+        }
+    }
+
+    arrayApplyBtn.addEventListener('click', () => {
+        if (!arrayTargetObject) { closeArrayModal(); return; }
+        const type = document.querySelector('input[name="array-type"]:checked').value;
+        if (type === 'linear') {
+            const count = parseInt(document.getElementById('array-linear-count').value, 10) || 2;
+            const direction = document.getElementById('array-direction').value;
+            const spacing = parseFloat(document.getElementById('array-spacing').value) || 1;
+            generateLinearArray(arrayTargetObject, count, direction, spacing);
+        } else {
+            const count = parseInt(document.getElementById('array-polar-count').value, 10) || 2;
+            const angle = parseFloat(document.getElementById('array-polar-angle').value) || 360;
+            const radius = parseFloat(document.getElementById('array-polar-radius').value) || 1;
+            generatePolarArray(arrayTargetObject, count, angle, radius);
+        }
+        arrayTargetObject = null;
+        closeArrayModal();
+    });
+
     downloadBtn.addEventListener('click', () => {
         const format = document.querySelector('input[name="format"]:checked').value;
         const scale = parseFloat(document.getElementById('export-scale').value);
@@ -871,45 +1208,90 @@ let roomColorIndex = 0;
 
     const FURNITURE_CATALOG = {
         'Living Room': [
-            { id: 'sofa', name: 'Sofa', file: 'sofa.svg', sizeMeters: 1.8 },
-            { id: 'armchair', name: 'Armchair', file: 'armchair.svg', sizeMeters: 0.9 },
-            { id: 'coffee-table', name: 'Coffee Table', file: 'coffee-table.svg', sizeMeters: 1.0 },
-            { id: 'tv', name: 'TV', file: 'tv.svg', sizeMeters: 1.0 },
-            { id: 'bookshelf', name: 'Bookshelf', file: 'bookshelf.svg', sizeMeters: 1.0 },
-            { id: 'rug', name: 'Rug', file: 'rug.svg', sizeMeters: 2.0 },
-            { id: 'floor-lamp', name: 'Floor Lamp', file: 'floor-lamp.svg', sizeMeters: 0.4 },
+            { id: 'sofa', name: 'Sofa', file: 'sofa.png', sizeMeters: 2.0 },
+            { id: 'loveseat', name: 'Loveseat', file: 'loveseat.png', sizeMeters: 1.4 },
+            { id: 'armchair', name: 'Armchair', file: 'chair.png', sizeMeters: 0.8 },
+            { id: 'coffee-table', name: 'Coffee Table', file: 'coffee_table.png', sizeMeters: 1.2 },
+            { id: 'tv-stand', name: 'TV Stand', file: 'tv_stand.png', sizeMeters: 1.5 },
+            { id: 'television', name: 'Television', file: 'television.png', sizeMeters: 1.2 },
+            { id: 'bookshelf', name: 'Bookshelf', file: 'bookshelf.png', sizeMeters: 0.8 },
+            { id: 'side-table', name: 'Side Table', file: 'side_table.png', sizeMeters: 0.5 },
+            { id: 'fireplace', name: 'Fireplace', file: 'fireplace.png', sizeMeters: 1.2 },
+            { id: 'storage', name: 'Storage Cabinet', file: 'storage.png', sizeMeters: 1.0 },
             { id: 'piano', name: 'Piano', file: 'piano.svg', sizeMeters: 1.5 },
         ],
         'Bedroom': [
-            { id: 'bed', name: 'Bed', file: 'bed.svg', sizeMeters: 2.0 },
-            { id: 'wardrobe', name: 'Wardrobe', file: 'wardrobe.svg', sizeMeters: 1.2 },
-            { id: 'nightstand', name: 'Nightstand', file: 'nightstand.svg', sizeMeters: 0.5 },
-            { id: 'dresser', name: 'Dresser', file: 'dresser.svg', sizeMeters: 1.2 },
-            { id: 'mirror', name: 'Mirror', file: 'mirror.svg', sizeMeters: 0.8 },
+            { id: 'bed-queen', name: 'Queen Bed', file: 'bed_queen.png', sizeMeters: 2.0 },
+            { id: 'bed-twin', name: 'Twin Bed', file: 'bed_twin.png', sizeMeters: 1.9 },
+            { id: 'nightstand', name: 'Nightstand', file: 'nightstand.png', sizeMeters: 0.5 },
+            { id: 'dresser', name: 'Dresser', file: 'dresser.png', sizeMeters: 1.2 },
+            { id: 'wardrobe', name: 'Wardrobe', file: 'wardrobe.png', sizeMeters: 1.2 },
             { id: 'coat-rack', name: 'Coat Rack', file: 'coat-rack.svg', sizeMeters: 0.4 },
         ],
         'Kitchen': [
-            { id: 'table', name: 'Dining Table', file: 'table.svg', sizeMeters: 1.2 },
-            { id: 'chair', name: 'Chair', file: 'chair.svg', sizeMeters: 0.5 },
-            { id: 'fridge', name: 'Fridge', file: 'fridge.svg', sizeMeters: 0.8 },
-            { id: 'stove', name: 'Stove', file: 'stove.svg', sizeMeters: 0.7 },
-            { id: 'sink-kitchen', name: 'Kitchen Sink', file: 'sink-kitchen.svg', sizeMeters: 0.7 },
-            { id: 'dishwasher', name: 'Dishwasher', file: 'dishwasher.svg', sizeMeters: 0.6 },
+            { id: 'stove', name: 'Stove', file: 'stove.png', sizeMeters: 0.6 },
+            { id: 'oven', name: 'Oven', file: 'oven.png', sizeMeters: 0.6 },
+            { id: 'fridge', name: 'Fridge', file: 'fridge.png', sizeMeters: 0.7 },
+            { id: 'sink-kitchen', name: 'Kitchen Sink', file: 'sink_k.png', sizeMeters: 0.6 },
+            { id: 'counter', name: 'Counter', file: 'counter.png', sizeMeters: 1.2 },
+            { id: 'dishwasher', name: 'Dishwasher', file: 'dishwasher.png', sizeMeters: 0.6 },
             { id: 'microwave', name: 'Microwave', file: 'microwave.svg', sizeMeters: 0.5 },
             { id: 'cabinet', name: 'Cabinet', file: 'cabinet.svg', sizeMeters: 1.0 },
         ],
         'Bathroom': [
-            { id: 'bathtub', name: 'Bathtub', file: 'bathtub.svg', sizeMeters: 1.5 },
-            { id: 'shower', name: 'Shower', file: 'shower.svg', sizeMeters: 0.9 },
-            { id: 'toilet', name: 'Toilet', file: 'toilet.svg', sizeMeters: 0.5 },
-            { id: 'sink-bathroom', name: 'Sink', file: 'sink-bathroom.svg', sizeMeters: 0.5 },
-            { id: 'washing-machine', name: 'Washing Machine', file: 'washing-machine.svg', sizeMeters: 0.6 },
+            { id: 'toilet', name: 'Toilet', file: 'toilet.png', sizeMeters: 0.65 },
+            { id: 'bathtub', name: 'Bathtub', file: 'bathtub.png', sizeMeters: 1.7 },
+            { id: 'shower', name: 'Shower', file: 'shower.png', sizeMeters: 0.9 },
+            { id: 'sink-bathroom', name: 'Sink', file: 'sink_b.png', sizeMeters: 0.6 },
+            { id: 'washer-dryer', name: 'Washer/Dryer', file: 'washer_dryer.png', sizeMeters: 0.65 },
         ],
         'Office': [
-            { id: 'desk', name: 'Desk', file: 'desk.svg', sizeMeters: 1.2 },
-            { id: 'office-chair', name: 'Office Chair', file: 'office-chair.svg', sizeMeters: 0.6 },
+            { id: 'desk', name: 'Desk', file: 'desk.png', sizeMeters: 1.4 },
+            { id: 'office-chair', name: 'Office Chair', file: 'office_chair.png', sizeMeters: 0.45 },
             { id: 'computer', name: 'Computer', file: 'computer.svg', sizeMeters: 0.5 },
             { id: 'printer', name: 'Printer', file: 'printer.svg', sizeMeters: 0.4 },
+        ],
+        'Dining': [
+            { id: 'dining-table', name: 'Dining Table', file: 'dining_table.png', sizeMeters: 1.2 },
+            { id: 'dining-chair', name: 'Dining Chair', file: 'dining_chair.png', sizeMeters: 0.45 },
+            { id: 'table', name: 'Table', file: 'table.png', sizeMeters: 1.0 },
+        ],
+        'Decor': [
+            { id: 'rug', name: 'Rug', file: 'rug.png', sizeMeters: 3.0 },
+            { id: 'round-rug', name: 'Round Rug', file: 'round_rug.png', sizeMeters: 2.0 },
+            { id: 'runner-rug', name: 'Runner Rug', file: 'runner_rug.png', sizeMeters: 2.5 },
+            { id: 'potted-plant', name: 'Potted Plant', file: 'potted_plant.png', sizeMeters: 0.4 },
+            { id: 'floor-plant', name: 'Floor Plant', file: 'floor_plant.png', sizeMeters: 0.5 },
+            { id: 'hanging-plant', name: 'Hanging Plant', file: 'hanging_plant.png', sizeMeters: 0.3 },
+            { id: 'curtain', name: 'Curtain', file: 'curtain.png', sizeMeters: 1.2 },
+            { id: 'sheer-curtain', name: 'Sheer Curtain', file: 'sheer_curtain.png', sizeMeters: 1.2 },
+            { id: 'wall-art', name: 'Wall Art', file: 'wall_art.png', sizeMeters: 0.8 },
+            { id: 'mirror', name: 'Mirror', file: 'mirror.png', sizeMeters: 0.6 },
+            { id: 'clock', name: 'Clock', file: 'clock.png', sizeMeters: 0.3 },
+        ],
+        'Lighting': [
+            { id: 'ceiling-light', name: 'Ceiling Light', file: 'ceiling_light.png', sizeMeters: 0.4 },
+            { id: 'chandelier', name: 'Chandelier', file: 'chandelier.png', sizeMeters: 0.6 },
+            { id: 'recessed-light', name: 'Recessed Light', file: 'recessed_light.png', sizeMeters: 0.15 },
+            { id: 'floor-lamp', name: 'Floor Lamp', file: 'floor_lamp.png', sizeMeters: 0.4 },
+            { id: 'table-lamp', name: 'Table Lamp', file: 'table_lamp.png', sizeMeters: 0.25 },
+            { id: 'wall-sconce', name: 'Wall Sconce', file: 'wall_sconce.png', sizeMeters: 0.15 },
+            { id: 'pendant-light', name: 'Pendant Light', file: 'pendant_light.png', sizeMeters: 0.3 },
+        ],
+        'Electrical & Plumbing': [
+            { id: 'sym-outlet', name: 'Power Outlet', file: 'sym_outlet.png', sizeMeters: 0.15 },
+            { id: 'sym-switch', name: 'Light Switch', file: 'sym_switch.png', sizeMeters: 0.15 },
+            { id: 'sym-ceiling-light', name: 'Ceiling Light Sym.', file: 'sym_ceiling_light.png', sizeMeters: 0.2 },
+            { id: 'sym-recessed-light', name: 'Recessed Light Sym.', file: 'sym_recessed_light.png', sizeMeters: 0.15 },
+            { id: 'sym-pendant', name: 'Pendant Sym.', file: 'sym_pendant.png', sizeMeters: 0.18 },
+            { id: 'sym-ceiling-fan', name: 'Ceiling Fan', file: 'sym_ceiling_fan.png', sizeMeters: 0.25 },
+            { id: 'sym-junction', name: 'Junction Box', file: 'sym_junction.png', sizeMeters: 0.12 },
+            { id: 'sym-smoke', name: 'Smoke Detector', file: 'sym_smoke.png', sizeMeters: 0.15 },
+            { id: 'sym-water-supply', name: 'Water Supply', file: 'sym_water_supply.png', sizeMeters: 0.15 },
+            { id: 'sym-drain', name: 'Drain Point', file: 'sym_drain.png', sizeMeters: 0.15 },
+            { id: 'sym-water-heater', name: 'Water Heater', file: 'sym_water_heater.png', sizeMeters: 0.2 },
+            { id: 'sym-washer-hookup', name: 'Washer Hookup', file: 'sym_washer_hookup.png', sizeMeters: 0.15 },
+            { id: 'sym-gas-line', name: 'Gas Line', file: 'sym_gas_line.png', sizeMeters: 0.15 },
         ],
         'Outdoor': [
             { id: 'plant', name: 'Plant', file: 'plant.svg', sizeMeters: 0.4 },
@@ -938,10 +1320,14 @@ let roomColorIndex = 0;
             el.dataset.assetId = item.id;
             el.title = item.name;
             el.innerHTML = `<div class="asset-icon"></div><span class="asset-label">${item.name}</span>`;
-            fetch(`assets/furniture/${item.file}`)
-                .then(res => res.text())
-                .then(svgText => { el.querySelector('.asset-icon').innerHTML = svgText; })
-                .catch(() => {});
+            if (item.file.endsWith('.png')) {
+                el.querySelector('.asset-icon').innerHTML = `<img src="assets/furniture/${item.file}" alt="${item.name}" draggable="false">`;
+            } else {
+                fetch(`assets/furniture/${item.file}`)
+                    .then(res => res.text())
+                    .then(svgText => { el.querySelector('.asset-icon').innerHTML = svgText; })
+                    .catch(() => {});
+            }
             grid.appendChild(el);
         });
         assetList.appendChild(grid);
@@ -956,28 +1342,41 @@ let roomColorIndex = 0;
         toolTip.innerText = `${item.title} selected — click on the canvas to place it.`;
     });
 
+    function finalizeFurnitureObject(obj, itemDef, x, y) {
+        const targetSizePx = itemDef.sizeMeters * PIXELS_PER_METER;
+        const scale = targetSizePx / Math.max(obj.width, obj.height, 1);
+        obj.set({
+            left: x, top: y,
+            originX: 'center', originY: 'center',
+            scaleX: scale, scaleY: scale,
+            selectable: true,
+            snapAngle: 15,
+            snapThreshold: 5,
+            data: { layer: 'furniture', type: 'furniture', name: itemDef.name }
+        });
+        obj.setControlsVisibility({ mt: false, mb: false, ml: false, mr: false });
+        canvas.add(obj);
+        setActiveAndSync(obj);
+        canvas.renderAll();
+        saveState();
+    }
+
     function placeFurniture(assetId, x, y) {
         const itemDef = FURNITURE_ITEMS.find(i => i.id === assetId);
         if (!itemDef) return;
-        fabric.loadSVGFromURL(`assets/furniture/${itemDef.file}`, (objects, options) => {
-            objects.forEach(o => {
-                if (o.stroke) o.set('stroke', cssVar('--text-primary'));
+        if (itemDef.file.endsWith('.png')) {
+            fabric.Image.fromURL(`assets/furniture/${itemDef.file}`, (img) => {
+                finalizeFurnitureObject(img, itemDef, x, y);
+            }, { crossOrigin: 'anonymous' });
+        } else {
+            fabric.loadSVGFromURL(`assets/furniture/${itemDef.file}`, (objects, options) => {
+                objects.forEach(o => {
+                    if (o.stroke) o.set('stroke', cssVar('--text-primary'));
+                });
+                const svgGroup = fabric.util.groupSVGElements(objects, options);
+                finalizeFurnitureObject(svgGroup, itemDef, x, y);
             });
-            const svgGroup = fabric.util.groupSVGElements(objects, options);
-            const targetSizePx = itemDef.sizeMeters * PIXELS_PER_METER;
-            const scale = targetSizePx / Math.max(svgGroup.width, svgGroup.height, 1);
-            svgGroup.set({
-                left: x, top: y,
-                originX: 'center', originY: 'center',
-                scaleX: scale, scaleY: scale,
-                selectable: true,
-                data: { layer: 'furniture', type: 'furniture', name: itemDef.name }
-            });
-            canvas.add(svgGroup);
-            canvas.setActiveObject(svgGroup);
-            canvas.renderAll();
-            saveState();
-        });
+        }
     }
 
     function setMode(mode) {
@@ -1008,7 +1407,7 @@ let roomColorIndex = 0;
                     data: { layer: 'walls', type: 'wall-system' }
                 });
                 canvas.add(offsetWall);
-                canvas.setActiveObject(offsetWall);
+                setActiveAndSync(offsetWall);
                 canvas.renderAll();
                 saveState();
             } else if (active && active.data && active.data.type === 'room') {
@@ -1026,7 +1425,7 @@ let roomColorIndex = 0;
                         data: { layer: 'walls', type: 'room' }
                     });
                     canvas.add(offsetRoom);
-                    canvas.setActiveObject(offsetRoom);
+                    setActiveAndSync(offsetRoom);
                     canvas.renderAll();
                     saveState();
                 } else {
@@ -1040,12 +1439,21 @@ let roomColorIndex = 0;
                         data: active.data ? Object.assign({}, active.data) : undefined
                     });
                     canvas.add(cloned);
-                    canvas.setActiveObject(cloned);
+                    setActiveAndSync(cloned);
                     canvas.renderAll();
                     saveState();
                 });
             } else {
                 postModeMessage = 'Select an object first, then click Offset.';
+            }
+            mode = 'select';
+        } else if (mode === 'array') {
+            const active = canvas.getActiveObject();
+            if (active && active.type !== 'activeSelection') {
+                arrayTargetObject = active;
+                openArrayModal();
+            } else {
+                postModeMessage = 'Select a single object first, then click Array.';
             }
             mode = 'select';
         }
@@ -1054,18 +1462,20 @@ let roomColorIndex = 0;
         if (currentMode !== mode && activeShape) cancelActiveShape();
 
         currentMode = mode;
-        isDrawing = false; isDefiningAngle = false; dimensionFirstPoint = null;
+        isDrawing = false; isDefiningAngle = false; dimensionFirstPoint = null; measureFirstPoint = null;
+        canvas.getObjects().filter(o => o.name === 'temp').forEach(o => canvas.remove(o));
         toolTip.innerText = '';
         wallThicknessSelector.classList.add('hidden');
         if (mode === 'wall') wallThicknessSelector.classList.remove('hidden');
 
         assetPanel.classList.toggle('hidden', mode !== 'asset');
 
-        const crosshairModes = ['wall', 'rect', 'stairs', 'dimension', 'door', 'window'];
+        const crosshairModes = ['wall', 'rect', 'stairs', 'dimension', 'door', 'window', 'measure'];
         canvas.defaultCursor = crosshairModes.includes(mode) ? 'crosshair' : 'default';
         canvas.selection = mode === 'select';
         canvas.discardActiveObject();
         canvas.renderAll();
+        updatePropertiesPanel(null);
 
         switch (mode) {
             case 'select': toolTip.innerText = ''; break;
@@ -1075,6 +1485,7 @@ let roomColorIndex = 0;
             case 'door': toolTip.innerText = 'Click near a wall to place a door.'; break;
             case 'window': toolTip.innerText = 'Click near a wall to place a window.'; break;
             case 'dimension': toolTip.innerText = 'Click two points to measure.'; break;
+            case 'measure': toolTip.innerText = 'Click two points for a quick distance readout.'; break;
             case 'trim': toolTip.innerText = 'Click near the end of a wall to trim/extend it to the nearest wall.'; break;
             case 'asset': toolTip.innerText = 'Select a furniture item, then click on the canvas.'; break;
         }
