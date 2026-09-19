@@ -42,6 +42,7 @@
             <button class="tool-btn" id="dimension-tool-btn" title="Dimension (D)"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3l4 4l-14 14l-4 -4l14 -14" /><path d="M16 7l-1.5 -1.5" /><path d="M13 10l-1.5 -1.5" /><path d="M10 13l-1.5 -1.5" /><path d="M7 16l-1.5 -1.5" /></svg></button>
             <button class="tool-btn" id="measure-tool-btn" title="Quick Measure (Q)"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19.875 12c.621 0 1.125 .512 1.125 1.143v5.714c0 .631 -.504 1.143 -1.125 1.143h-15.875a1 1 0 0 1 -1 -1v-5.857c0 -.631 .504 -1.143 1.125 -1.143h15.75" /><path d="M9 12v2" /><path d="M6 12v3" /><path d="M12 12v3" /><path d="M18 12v3" /><path d="M15 12v2" /><path d="M3 3v4" /></svg></button>
             <button class="tool-btn" id="array-tool-btn" title="Array Copy"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M11 5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M18 5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M4 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M11 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M18 12a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M4 19a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M11 19a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M18 19a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /></svg></button>
+            <button class="tool-btn" id="text-tool-btn" title="Text (X)"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l3 0" /><path d="M14 20l7 0" /><path d="M6.9 15l6.9 0" /><path d="M10.2 6.3l5.8 13.7" /><path d="M5 20l6 -16l2 0l7 16" /></svg></button>
             <button class="tool-btn" id="asset-tool-btn" title="Place Furniture (A)"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11a2 2 0 0 1 2 2v2h10v-2a2 2 0 1 1 4 0v4a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-4a2 2 0 0 1 2 -2" /><path d="M5 11v-5a3 3 0 0 1 3 -3h8a3 3 0 0 1 3 3v5" /><path d="M6 19v2" /><path d="M18 19v2" /></svg></button>
         </aside>
 
@@ -52,11 +53,15 @@
 
         <div id="panel-backdrop"></div>
         <aside id="right-panel">
-            <div id="layers-panel"><h3>Layers</h3><ul id="layer-list">
+            <div id="layers-panel">
+                <div class="panel-heading-row"><h3>Layers</h3><button id="add-layer-btn" title="Add Layer"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5l0 14" /><path d="M5 12l14 0" /></svg></button></div>
+                <ul id="layer-list">
                 <li class="layer-item" data-layer="walls"><span>Walls</span><span class="visibility-toggle" data-visible="true"></span></li>
                 <li class="layer-item" data-layer="furniture"><span>Furniture</span><span class="visibility-toggle" data-visible="true"></span></li>
                 <li class="layer-item" data-layer="dimensions"><span>Dimensions</span><span class="visibility-toggle" data-visible="true"></span></li>
-            </ul></div>
+                <li class="layer-item" data-layer="annotations"><span>Annotations</span><span class="visibility-toggle" data-visible="true"></span></li>
+                </ul>
+            </div>
             <div id="properties-panel"><h3>Properties</h3><div id="panel-content"><div id="panel-content-placeholder">Select an object.</div></div></div>
             <div id="asset-panel-container" class="hidden"><h3>Assets</h3><div id="asset-list"></div></div>
         </aside>
@@ -67,6 +72,7 @@
             <div id="zoom-display">Zoom: 100%</div>
             <div class="toggle-container"><input type="checkbox" id="show-rulers-checkbox" checked><label for="show-rulers-checkbox">Show Rulers</label></div>
             <div class="toggle-container" id="snap-toggle"><input type="checkbox" id="snap-checkbox" checked><label for="snap-checkbox">Snap to Grid</label></div>
+            <div class="toggle-container" id="object-snap-toggle"><input type="checkbox" id="object-snap-checkbox" checked><label for="object-snap-checkbox">Object Snap</label></div>
         </footer>
     </div>
 

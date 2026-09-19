@@ -1,5 +1,6 @@
-export function saveProject(canvas) {
-    const json = JSON.stringify(canvas.toJSON(['data', 'name']));
+export function saveProject(canvas, meta) {
+    const payload = { canvasData: canvas.toJSON(['data', 'name']), meta: meta || {} };
+    const json = JSON.stringify(payload);
     const blob = new Blob([json], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -14,8 +15,18 @@ export function saveProject(canvas) {
 export function loadProject(canvas, file, onComplete) {
     const reader = new FileReader();
     reader.onload = (event) => {
-        canvas.loadFromJSON(event.target.result, () => {
-            if (onComplete) onComplete();
+        let payload;
+        try {
+            payload = JSON.parse(event.target.result);
+        } catch (err) {
+            if (onComplete) onComplete(null);
+            return;
+        }
+        const isWrapped = payload && payload.canvasData;
+        const canvasData = isWrapped ? payload.canvasData : payload;
+        const meta = isWrapped ? payload.meta : {};
+        canvas.loadFromJSON(canvasData, () => {
+            if (onComplete) onComplete(meta);
         });
     };
     reader.readAsText(file);

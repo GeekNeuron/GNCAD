@@ -61,6 +61,8 @@ h3 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom
 .prop-item { margin-bottom: 15px; }
 .prop-item label { display: block; font-size: 12px; margin-bottom: 5px; color: var(--text-secondary); }
 .prop-item input { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; background-color: var(--bg-main); color: var(--text-primary); transition: border-color 0.2s; }
+.prop-item select { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 14px; background-color: var(--bg-main); color: var(--text-primary); transition: border-color 0.2s; cursor: pointer; }
+.prop-item select:focus { outline: none; border-color: var(--accent-primary); }
 .prop-item input:disabled { color: var(--text-secondary); }
 .prop-item input:focus { outline: none; border-color: var(--accent-primary); }
 .prop-input-wrap { position: relative; }
@@ -112,6 +114,15 @@ h3 { margin-top: 0; border-bottom: 1px solid var(--border-color); padding-bottom
 .action-btn { background-color: var(--accent-primary); color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 500;}
 
 #layers-panel { margin-bottom: 20px; }
+.panel-heading-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 15px; }
+.panel-heading-row h3 { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+#add-layer-btn { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-main); color: var(--text-secondary); cursor: pointer; transition: color 0.2s, border-color 0.2s; }
+#add-layer-btn:hover { color: var(--accent-primary); border-color: var(--accent-primary); }
+#add-layer-btn .icon { width: 12px; height: 12px; }
+.custom-layer-item { display: flex; align-items: center; }
+.custom-layer-item .remove-layer-btn { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; color: var(--text-secondary); cursor: pointer; opacity: 0.6; margin-right: 6px; }
+.custom-layer-item .remove-layer-btn:hover { opacity: 1; color: #e94560; }
+.custom-layer-item .remove-layer-btn .icon { width: 12px; height: 12px; }
 #layer-list { list-style: none; padding: 0; margin: 0; }
 .layer-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-radius: 4px; transition: background-color 0.2s; user-select: none; }
 .layer-item:hover { background-color: var(--accent-secondary); }

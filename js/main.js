@@ -11,6 +11,7 @@ const ICON_EYE_OFF = ICON_SVG_OPEN + '<path d="M10.585 10.587a2 2 0 0 0 2.829 2.
 const ICON_LOCK = ICON_SVG_OPEN + '<path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" /><path d="M8 11v-4a4 4 0 1 1 8 0v4" /></svg>';
 const ICON_LOCK_OPEN = ICON_SVG_OPEN + '<path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2l0 -6" /><path d="M11 16a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /><path d="M8 11v-5a4 4 0 0 1 8 0" /></svg>';
 const ICON_TRASH = ICON_SVG_OPEN + '<path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>';
+const ICON_X = ICON_SVG_OPEN + '<path d="M18 6l-12 12" /><path d="M6 6l12 12" /></svg>';
 const ICON_ALIGN_LEFT = ICON_SVG_OPEN + '<path d="M4 4l0 16" /><path d="M8 11a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -2" /></svg>';
 const ICON_ALIGN_HCENTER = ICON_SVG_OPEN + '<path d="M12 4l0 5" /><path d="M12 15l0 5" /><path d="M6 11a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -2" /></svg>';
 const ICON_ALIGN_RIGHT = ICON_SVG_OPEN + '<path d="M20 4l0 16" /><path d="M4 11a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v2a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -2" /></svg>';
@@ -56,6 +57,7 @@ let roomColorIndex = 0;
     let clipboardData = null;
     let nudgeSaveTimer = null;
     let arrayTargetObject = null;
+    let customLayers = [];
 
     const canvasContainer = document.getElementById('canvas-container');
     const panelContent = document.getElementById('panel-content');
@@ -66,6 +68,7 @@ let roomColorIndex = 0;
     const zoomDisplay = document.getElementById('zoom-display');
     const toolTip = document.getElementById('tool-tip');
     const snapCheckbox = document.getElementById('snap-checkbox');
+    const objectSnapCheckbox = document.getElementById('object-snap-checkbox');
     const showRulersCheckbox = document.getElementById('show-rulers-checkbox');
     const toolButtons = document.querySelectorAll('.tool-btn');
     const fileMenuBtn = document.getElementById('file-menu-btn');
@@ -228,6 +231,7 @@ let roomColorIndex = 0;
         else if (type === 'stairs') renderStairsProperties(obj);
         else if (layer === 'furniture') renderFurnitureProperties(obj);
         else if (type === 'user-group') renderGroupProperties(obj);
+        else if (type === 'text') renderTextProperties(obj);
     }
 
     function setActiveAndSync(obj) {
@@ -266,12 +270,50 @@ let roomColorIndex = 0;
         });
         toolbar.appendChild(deleteBtn);
         panelContent.appendChild(toolbar);
+
+        if (obj.data && obj.data.layer) {
+            const layerRow = document.createElement('div');
+            layerRow.className = 'prop-item';
+            const layerLabel = document.createElement('label');
+            layerLabel.innerText = 'Layer';
+            layerRow.appendChild(layerLabel);
+            const layerSelect = document.createElement('select');
+            getAllLayers().forEach(l => {
+                const opt = document.createElement('option');
+                opt.value = l.id;
+                opt.innerText = l.name;
+                if (l.id === obj.data.layer) opt.selected = true;
+                layerSelect.appendChild(opt);
+            });
+            layerSelect.addEventListener('change', (e) => {
+                obj.data.layer = e.target.value;
+                const targetToggle = layerList.querySelector(`.layer-item[data-layer="${e.target.value}"] .visibility-toggle`);
+                obj.visible = !targetToggle || targetToggle.dataset.visible === 'true';
+                canvas.renderAll();
+                saveState();
+            });
+            layerRow.appendChild(layerSelect);
+            panelContent.appendChild(layerRow);
+        }
     }
 
     function renderGroupProperties(obj) {
         const hint = document.createElement('div');
         hint.className = 'prop-hint';
         hint.innerText = `Group of ${obj._objects ? obj._objects.length : 0} objects. Ctrl+Shift+G to ungroup.`;
+        panelContent.appendChild(hint);
+    }
+
+    function renderTextProperties(obj) {
+        createPropItem('Font Size', obj.fontSize, 'px', true, (newValue) => {
+            obj.set('fontSize', Math.max(6, newValue));
+            canvas.renderAll();
+            saveState();
+        });
+        createPropItem('Angle', obj.angle.toFixed(0), '°', true, (newValue) => { obj.set('angle', newValue); canvas.renderAll(); });
+        const hint = document.createElement('div');
+        hint.className = 'prop-hint';
+        hint.innerText = 'Double-click the text on the canvas to edit its content.';
         panelContent.appendChild(hint);
     }
 
@@ -714,6 +756,61 @@ let roomColorIndex = 0;
         drawRulers();
     });
 
+    function getObjectSnapEdges(obj) {
+        const rect = obj.getBoundingRect(true, true);
+        return {
+            left: rect.left, right: rect.left + rect.width, centerX: rect.left + rect.width / 2,
+            top: rect.top, bottom: rect.top + rect.height, centerY: rect.top + rect.height / 2,
+        };
+    }
+
+    function clearSnapGuides() {
+        canvas.getObjects().filter(o => o.name === 'snap-guide').forEach(o => canvas.remove(o));
+    }
+
+    function drawSnapGuide(isVertical, position) {
+        const points = isVertical
+            ? [position, 0, position, canvas.getHeight()]
+            : [0, position, canvas.getWidth(), position];
+        canvas.add(new fabric.Line(points, {
+            stroke: cssVar('--accent-primary'), strokeWidth: 1, strokeDashArray: [4, 4],
+            selectable: false, evented: false, name: 'snap-guide'
+        }));
+    }
+
+    canvas.on('object:moving', (e) => {
+        clearSnapGuides();
+        if (!objectSnapCheckbox.checked) return;
+        const target = e.target;
+        if (target.name === 'temp' || target.type === 'activeSelection') return;
+        const threshold = 8;
+        const edges = getObjectSnapEdges(target);
+        let bestDx = null, bestDy = null, guideXPos = null, guideYPos = null;
+
+        canvas.getObjects().forEach(obj => {
+            if (obj === target || obj.name === 'temp' || obj.name === 'snap-guide' || !obj.data) return;
+            const other = getObjectSnapEdges(obj);
+            [['left', 'left'], ['left', 'right'], ['right', 'right'], ['right', 'left'], ['centerX', 'centerX']].forEach(([a, b]) => {
+                const delta = other[b] - edges[a];
+                if (Math.abs(delta) < threshold && (bestDx === null || Math.abs(delta) < Math.abs(bestDx))) {
+                    bestDx = delta;
+                    guideXPos = other[b];
+                }
+            });
+            [['top', 'top'], ['top', 'bottom'], ['bottom', 'bottom'], ['bottom', 'top'], ['centerY', 'centerY']].forEach(([a, b]) => {
+                const delta = other[b] - edges[a];
+                if (Math.abs(delta) < threshold && (bestDy === null || Math.abs(delta) < Math.abs(bestDy))) {
+                    bestDy = delta;
+                    guideYPos = other[b];
+                }
+            });
+        });
+
+        if (bestDx !== null) { target.set('left', target.left + bestDx); drawSnapGuide(true, guideXPos); }
+        if (bestDy !== null) { target.set('top', target.top + bestDy); drawSnapGuide(false, guideYPos); }
+        if (bestDx !== null || bestDy !== null) canvas.renderAll();
+    });
+
     canvas.on({
         'selection:created': (e) => updatePropertiesPanel(e.target),
         'selection:updated': (e) => updatePropertiesPanel(e.target),
@@ -725,6 +822,8 @@ let roomColorIndex = 0;
             }
         },
         'object:modified': (e) => {
+            clearSnapGuides();
+            canvas.renderAll();
             const target = e.target;
             if (target.data && target.data.type === 'room') {
                 updateRoomDimensions(target);
@@ -800,6 +899,37 @@ let roomColorIndex = 0;
                 toolTip.innerText = `Distance: ${distM} m — click to start a new measurement.`;
                 measureFirstPoint = null;
             }
+            return;
+        }
+
+        if (currentMode === 'text') {
+            const textObj = new fabric.IText('Text', {
+                left: snappedPointer.x, top: snappedPointer.y,
+                fontFamily: 'Inter, Vazirmatn, sans-serif',
+                fontSize: 16,
+                fill: cssVar('--text-primary'),
+                selectable: true,
+                data: { layer: 'annotations', type: 'text' }
+            });
+            canvas.add(textObj);
+            canvas.setActiveObject(textObj);
+            canvas.renderAll();
+            textObj.enterEditing();
+            textObj.selectAll();
+            textObj.on('editing:exited', () => {
+                if (!textObj.text.trim()) {
+                    canvas.remove(textObj);
+                    updatePropertiesPanel(null);
+                } else {
+                    updatePropertiesPanel(textObj);
+                }
+                saveState();
+            });
+            currentMode = 'select';
+            canvas.defaultCursor = 'default';
+            canvas.selection = true;
+            toolButtons.forEach(btn => btn.classList.remove('active'));
+            document.getElementById('select-tool-btn').classList.add('active');
             return;
         }
 
@@ -972,6 +1102,7 @@ let roomColorIndex = 0;
             case 's': setMode('stairs'); break;
             case 'd': setMode('dimension'); break;
             case 'a': setMode('asset'); break;
+            case 'x': setMode('text'); break;
             case 'm': setMode('mirror'); break;
             case 'o': setMode('offset'); break;
             case 't': setMode('trim'); break;
@@ -1025,13 +1156,18 @@ let roomColorIndex = 0;
 
     fileMenuBtn.addEventListener('click', (e) => { e.stopPropagation(); fileMenuDropdown.classList.toggle('show'); });
     window.addEventListener('click', () => { if (fileMenuDropdown.classList.contains('show')) fileMenuDropdown.classList.remove('show'); });
-    function clearCanvas() { if (confirm('Are you sure? All unsaved work will be lost.')) { canvas.clear(); historyManager.reset(); canvas.backgroundColor = createGridPattern(); canvas.renderAll(); syncLayerUI(); drawRulers(); saveState(); } }
+    function clearCanvas() { if (confirm('Are you sure? All unsaved work will be lost.')) { canvas.clear(); layerList.querySelectorAll('.custom-layer-item').forEach(el => el.remove()); customLayers = []; historyManager.reset(); canvas.backgroundColor = createGridPattern(); canvas.renderAll(); syncLayerUI(); drawRulers(); saveState(); } }
     newBtn.addEventListener('click', clearCanvas);
-    saveBtn.addEventListener('click', () => saveProject(canvas));
+    saveBtn.addEventListener('click', () => saveProject(canvas, { customLayers }));
     loadBtn.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0]; if (!file) return;
-        loadProject(canvas, file, () => {
+        loadProject(canvas, file, (meta) => {
+            layerList.querySelectorAll('.custom-layer-item').forEach(el => el.remove());
+            customLayers = [];
+            if (meta && Array.isArray(meta.customLayers)) {
+                meta.customLayers.forEach(l => addCustomLayer(l.name, l.id));
+            }
             canvas.backgroundColor = createGridPattern(); canvas.renderAll(); syncLayerUI(); drawRulers(); fileInput.value = ''; historyManager.reset(); saveState();
         });
     });
@@ -1181,6 +1317,12 @@ let roomColorIndex = 0;
     const layerList = document.getElementById('layer-list');
     layerList.querySelectorAll('.visibility-toggle').forEach(toggle => { toggle.innerHTML = ICON_EYE; });
     layerList.addEventListener('click', (e) => {
+        const removeBtn = e.target.closest('.remove-layer-btn');
+        if (removeBtn) {
+            const layerItem = removeBtn.closest('.layer-item');
+            removeCustomLayer(layerItem.dataset.layer);
+            return;
+        }
         const toggle = e.target.closest('.visibility-toggle');
         if (!toggle) return;
         const layerItem = toggle.closest('.layer-item');
@@ -1194,6 +1336,45 @@ let roomColorIndex = 0;
             }
         });
         canvas.renderAll();
+    });
+
+    function getAllLayers() {
+        return [
+            { id: 'walls', name: 'Walls' },
+            { id: 'furniture', name: 'Furniture' },
+            { id: 'dimensions', name: 'Dimensions' },
+            { id: 'annotations', name: 'Annotations' },
+            ...customLayers,
+        ];
+    }
+
+    function addCustomLayer(name, existingId) {
+        const id = existingId || ('custom-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Date.now().toString(36));
+        customLayers.push({ id, name });
+        const li = document.createElement('li');
+        li.className = 'layer-item custom-layer-item';
+        li.dataset.layer = id;
+        li.innerHTML = `<span class="remove-layer-btn">${ICON_X}</span><span>${name}</span><span class="visibility-toggle" data-visible="true">${ICON_EYE}</span>`;
+        layerList.appendChild(li);
+    }
+
+    function removeCustomLayer(id) {
+        customLayers = customLayers.filter(l => l.id !== id);
+        const li = layerList.querySelector(`.layer-item[data-layer="${id}"]`);
+        if (li) li.remove();
+        canvas.getObjects().forEach(obj => {
+            if (obj.data && obj.data.layer === id) {
+                obj.data.layer = 'furniture';
+                obj.visible = true;
+            }
+        });
+        canvas.renderAll();
+        if (canvas.getActiveObject()) updatePropertiesPanel(canvas.getActiveObject());
+    }
+
+    document.getElementById('add-layer-btn').addEventListener('click', () => {
+        const name = prompt('New layer name:');
+        if (name && name.trim()) addCustomLayer(name.trim());
     });
 
     function syncLayerUI() {
@@ -1470,7 +1651,7 @@ let roomColorIndex = 0;
 
         assetPanel.classList.toggle('hidden', mode !== 'asset');
 
-        const crosshairModes = ['wall', 'rect', 'stairs', 'dimension', 'door', 'window', 'measure'];
+        const crosshairModes = ['wall', 'rect', 'stairs', 'dimension', 'door', 'window', 'measure', 'text'];
         canvas.defaultCursor = crosshairModes.includes(mode) ? 'crosshair' : 'default';
         canvas.selection = mode === 'select';
         canvas.discardActiveObject();
@@ -1486,6 +1667,7 @@ let roomColorIndex = 0;
             case 'window': toolTip.innerText = 'Click near a wall to place a window.'; break;
             case 'dimension': toolTip.innerText = 'Click two points to measure.'; break;
             case 'measure': toolTip.innerText = 'Click two points for a quick distance readout.'; break;
+            case 'text': toolTip.innerText = 'Click on the canvas to add a text label.'; break;
             case 'trim': toolTip.innerText = 'Click near the end of a wall to trim/extend it to the nearest wall.'; break;
             case 'asset': toolTip.innerText = 'Select a furniture item, then click on the canvas.'; break;
         }
