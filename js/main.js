@@ -58,6 +58,8 @@ let roomColorIndex = 0;
     let nudgeSaveTimer = null;
     let arrayTargetObject = null;
     let customLayers = [];
+    let isPanning = false;
+    let lastPanPoint = null;
 
     const canvasContainer = document.getElementById('canvas-container');
     const panelContent = document.getElementById('panel-content');
@@ -150,7 +152,9 @@ let roomColorIndex = 0;
         rulerTopCtx.strokeStyle = fontColor;
         rulerTopCtx.lineWidth = 0.5;
         
-        for (let i = 0; i < rulerTopCanvas.width / zoom; i += GRID_SIZE) {
+        const startX = Math.floor((-panX / zoom) / GRID_SIZE) * GRID_SIZE;
+        const endX = (rulerTopCanvas.width - panX) / zoom;
+        for (let i = startX; i < endX; i += GRID_SIZE) {
             const screenX = i * zoom + panX;
             if (screenX > rulerTopCanvas.width) break;
             if (screenX < 0) continue;
@@ -158,7 +162,7 @@ let roomColorIndex = 0;
             rulerTopCtx.moveTo(screenX, 15);
             rulerTopCtx.lineTo(screenX, 20);
             rulerTopCtx.stroke();
-            if (i % (GRID_SIZE * 2) === 0) {
+            if (Math.round(i / GRID_SIZE) % 2 === 0) {
                  const meter = Math.round(i / PIXELS_PER_METER);
                  rulerTopCtx.fillText(`${meter}`, screenX + 2, 12);
             }
@@ -171,8 +175,10 @@ let roomColorIndex = 0;
         rulerLeftCtx.fillStyle = fontColor;
         rulerLeftCtx.strokeStyle = fontColor;
         rulerLeftCtx.lineWidth = 0.5;
-        
-        for (let i = 0; i < rulerLeftCanvas.height / zoom; i += GRID_SIZE) {
+
+        const startY = Math.floor((-panY / zoom) / GRID_SIZE) * GRID_SIZE;
+        const endY = (rulerLeftCanvas.height - panY) / zoom;
+        for (let i = startY; i < endY; i += GRID_SIZE) {
             const screenY = i * zoom + panY;
             if (screenY > rulerLeftCanvas.height) break;
             if (screenY < 0) continue;
@@ -180,7 +186,7 @@ let roomColorIndex = 0;
             rulerLeftCtx.moveTo(15, screenY);
             rulerLeftCtx.lineTo(20, screenY);
             rulerLeftCtx.stroke();
-            if (i % (GRID_SIZE * 2) === 0) {
+            if (Math.round(i / GRID_SIZE) % 2 === 0) {
                  const meter = Math.round(i / PIXELS_PER_METER);
                  rulerLeftCtx.save();
                  rulerLeftCtx.translate(12, screenY + 2);
@@ -833,6 +839,13 @@ let roomColorIndex = 0;
     });
 
     canvas.on('mouse:down', (o) => {
+        if (canvas.isGrabMode) {
+            isPanning = true;
+            lastPanPoint = { x: o.e.clientX, y: o.e.clientY };
+            canvas.defaultCursor = 'grabbing';
+            canvas.setCursor('grabbing');
+            return;
+        }
         if (o.target && o.target.selectable && currentMode !== 'select') return;
         if (o.target && currentMode === 'select') return;
 
@@ -960,7 +973,16 @@ let roomColorIndex = 0;
     canvas.on('mouse:move', (o) => {
         lastMousePos = {x: o.e.offsetX, y: o.e.offsetY};
         drawCrosshairs(lastMousePos);
-        if (canvas.isGrabMode) { drawRulers(); return; }
+        if (canvas.isGrabMode) {
+            if (isPanning && lastPanPoint) {
+                const dx = o.e.clientX - lastPanPoint.x;
+                const dy = o.e.clientY - lastPanPoint.y;
+                canvas.relativePan({ x: dx, y: dy });
+                lastPanPoint = { x: o.e.clientX, y: o.e.clientY };
+            }
+            drawRulers();
+            return;
+        }
 
         const pointer = canvas.getPointer(o.e);
         const snappedPointer = { x: snap(pointer.x), y: snap(pointer.y) };
@@ -986,6 +1008,13 @@ let roomColorIndex = 0;
     });
 
     canvas.on('mouse:up', () => {
+        if (canvas.isGrabMode) {
+            isPanning = false;
+            lastPanPoint = null;
+            canvas.defaultCursor = 'grab';
+            canvas.setCursor('grab');
+            return;
+        }
         if (currentMode === 'wall') return;
         if (isDrawing) {
             if (activeShape) {
@@ -1147,6 +1176,8 @@ let roomColorIndex = 0;
         if (e.code === 'Space') {
             e.preventDefault();
             canvas.isGrabMode = false;
+            isPanning = false;
+            lastPanPoint = null;
             canvas.defaultCursor = 'default';
             canvas.selection = true;
             canvas.renderAll();
@@ -1306,6 +1337,33 @@ let roomColorIndex = 0;
         drawRulers();
         drawCrosshairs(lastMousePos);
     });
+
+    const panBtn = document.getElementById('pan-btn');
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+
+    function setGrabMode(active) {
+        canvas.isGrabMode = active;
+        canvas.defaultCursor = active ? 'grab' : 'default';
+        canvas.selection = !active;
+        panBtn.classList.toggle('active', active);
+        canvas.renderAll();
+    }
+
+    panBtn.addEventListener('click', () => setGrabMode(!canvas.isGrabMode));
+
+    function zoomBy(factor) {
+        let zoom = canvas.getZoom() * factor;
+        if (zoom > 10) zoom = 10;
+        if (zoom < 0.1) zoom = 0.1;
+        const center = { x: canvas.getWidth() / 2, y: canvas.getHeight() / 2 };
+        canvas.zoomToPoint(center, zoom);
+        zoomDisplay.innerText = `Zoom: ${Math.round(zoom * 100)}%`;
+        drawRulers();
+    }
+
+    zoomInBtn.addEventListener('click', () => zoomBy(1.2));
+    zoomOutBtn.addEventListener('click', () => zoomBy(1 / 1.2));
     wallThicknessSelector.addEventListener('click', (e) => {
         if (e.target.classList.contains('thickness-option')) {
             wallThicknessSelector.querySelectorAll('.thickness-option').forEach(el => el.classList.remove('active'));
@@ -1562,6 +1620,9 @@ let roomColorIndex = 0;
 
     function setMode(mode) {
         let postModeMessage = null;
+        canvas.isGrabMode = false;
+        const panBtnEl = document.getElementById('pan-btn');
+        if (panBtnEl) panBtnEl.classList.remove('active');
 
         if (mode === 'mirror') {
             const active = canvas.getActiveObject();
