@@ -762,6 +762,12 @@ let roomColorIndex = 0;
         drawRulers();
     });
 
+    function getClientPoint(e) {
+        if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+        if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+        return { x: e.clientX, y: e.clientY };
+    }
+
     function getObjectSnapEdges(obj) {
         const rect = obj.getBoundingRect(true, true);
         return {
@@ -841,12 +847,12 @@ let roomColorIndex = 0;
     canvas.on('mouse:down', (o) => {
         if (canvas.isGrabMode) {
             isPanning = true;
-            lastPanPoint = { x: o.e.clientX, y: o.e.clientY };
+            lastPanPoint = getClientPoint(o.e);
             canvas.defaultCursor = 'grabbing';
             canvas.setCursor('grabbing');
             return;
         }
-        if (o.target && o.target.selectable && currentMode !== 'select') return;
+        if (o.target && o.target.selectable && currentMode !== 'select' && currentMode !== 'text' && currentMode !== 'measure') return;
         if (o.target && currentMode === 'select') return;
 
         const pointer = canvas.getPointer(o.e);
@@ -971,14 +977,17 @@ let roomColorIndex = 0;
     });
 
     canvas.on('mouse:move', (o) => {
-        lastMousePos = {x: o.e.offsetX, y: o.e.offsetY};
+        const clientPt = getClientPoint(o.e);
+        const containerRect = canvasContainer.getBoundingClientRect();
+        lastMousePos = { x: clientPt.x - containerRect.left, y: clientPt.y - containerRect.top };
         drawCrosshairs(lastMousePos);
         if (canvas.isGrabMode) {
             if (isPanning && lastPanPoint) {
-                const dx = o.e.clientX - lastPanPoint.x;
-                const dy = o.e.clientY - lastPanPoint.y;
+                const currentPoint = getClientPoint(o.e);
+                const dx = currentPoint.x - lastPanPoint.x;
+                const dy = currentPoint.y - lastPanPoint.y;
                 canvas.relativePan({ x: dx, y: dy });
-                lastPanPoint = { x: o.e.clientX, y: o.e.clientY };
+                lastPanPoint = currentPoint;
             }
             drawRulers();
             return;
@@ -1291,6 +1300,117 @@ let roomColorIndex = 0;
         }
         arrayTargetObject = null;
         closeArrayModal();
+    });
+
+    const PAPER_SIZES_CM = {
+        a4: { width: 21, height: 29.7 },
+        letter: { width: 21.6, height: 27.9 },
+    };
+
+    function getContentBoundingBox() {
+        const objects = canvas.getObjects().filter(o => o.name !== 'temp' && o.name !== 'snap-guide');
+        if (!objects.length) return null;
+        const originalVpt = canvas.viewportTransform.slice();
+        canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        objects.forEach(o => {
+            const rect = o.getBoundingRect(true, true);
+            minX = Math.min(minX, rect.left);
+            minY = Math.min(minY, rect.top);
+            maxX = Math.max(maxX, rect.left + rect.width);
+            maxY = Math.max(maxY, rect.top + rect.height);
+        });
+        canvas.setViewportTransform(originalVpt);
+        const padding = GRID_SIZE;
+        return { left: minX - padding, top: minY - padding, width: (maxX - minX) + padding * 2, height: (maxY - minY) + padding * 2 };
+    }
+
+    function getPrintPlan() {
+        const bbox = getContentBoundingBox();
+        if (!bbox) return null;
+        const scaleDenominator = parseFloat(document.getElementById('print-scale').value);
+        const paperKey = document.getElementById('print-paper').value;
+        const orientation = document.querySelector('input[name="print-orientation"]:checked').value;
+        let paper = PAPER_SIZES_CM[paperKey];
+        if (orientation === 'landscape') paper = { width: paper.height, height: paper.width };
+
+        const widthM = bbox.width / PIXELS_PER_METER;
+        const heightM = bbox.height / PIXELS_PER_METER;
+        const printedWidthCm = (widthM * 100) / scaleDenominator;
+        const printedHeightCm = (heightM * 100) / scaleDenominator;
+        const fits = printedWidthCm <= paper.width && printedHeightCm <= paper.height;
+
+        return { bbox, scaleDenominator, paper, orientation, printedWidthCm, printedHeightCm, fits };
+    }
+
+    function updatePrintFitHint() {
+        const plan = getPrintPlan();
+        const hint = document.getElementById('print-fit-hint');
+        if (!plan) { hint.innerText = 'Nothing to print yet.'; return; }
+        const sizeText = `${plan.printedWidthCm.toFixed(1)} x ${plan.printedHeightCm.toFixed(1)} cm at 1:${plan.scaleDenominator}`;
+        hint.innerText = plan.fits
+            ? `Fits the page (${sizeText}).`
+            : `Too large for one page at this scale (${sizeText}). Try a larger scale number (e.g. 1:100) or a bigger paper size.`;
+        hint.style.color = plan.fits ? 'var(--text-secondary)' : 'var(--accent-primary)';
+    }
+
+    const printModalOverlay = document.getElementById('print-modal-overlay');
+    const printModal = document.getElementById('print-modal');
+    document.getElementById('print-btn').addEventListener('click', () => {
+        printModalOverlay.classList.remove('hidden');
+        printModal.classList.remove('hidden');
+        updatePrintFitHint();
+    });
+    function closePrintModal() { printModalOverlay.classList.add('hidden'); printModal.classList.add('hidden'); }
+    document.getElementById('close-print-modal-btn').addEventListener('click', closePrintModal);
+    printModalOverlay.addEventListener('click', closePrintModal);
+    ['print-scale', 'print-paper'].forEach(id => document.getElementById(id).addEventListener('change', updatePrintFitHint));
+    document.querySelectorAll('input[name="print-orientation"]').forEach(r => r.addEventListener('change', updatePrintFitHint));
+
+    function forEachDeepObject(objects, callback) {
+        objects.forEach(obj => {
+            callback(obj);
+            if (obj._objects) forEachDeepObject(obj._objects, callback);
+        });
+    }
+
+    document.getElementById('print-apply-btn').addEventListener('click', () => {
+        const plan = getPrintPlan();
+        if (!plan) { closePrintModal(); return; }
+        const PRINT_DPI = 150;
+        const pixelsPerCm = PRINT_DPI / 2.54;
+        const targetWidthPx = plan.printedWidthCm * pixelsPerCm;
+        const multiplier = targetWidthPx / plan.bbox.width;
+
+        const originalBg = canvas.backgroundColor;
+        canvas.backgroundColor = '#ffffff';
+        const colorOverrides = [];
+        forEachDeepObject(canvas.getObjects(), (obj) => {
+            if (obj.stroke) { colorOverrides.push({ obj, prop: 'stroke', original: obj.stroke }); obj.stroke = '#1a1a1a'; }
+            if (obj.type === 'i-text' || obj.type === 'text') { if (obj.fill) { colorOverrides.push({ obj, prop: 'fill', original: obj.fill }); obj.fill = '#1a1a1a'; } }
+        });
+
+        const originalVpt = canvas.viewportTransform.slice();
+        canvas.setViewportTransform([1, 0, 0, 1, 0, 0]);
+        const dataUrl = canvas.toDataURL({
+            format: 'png',
+            left: plan.bbox.left,
+            top: plan.bbox.top,
+            width: plan.bbox.width,
+            height: plan.bbox.height,
+            multiplier: multiplier,
+        });
+        canvas.setViewportTransform(originalVpt);
+        canvas.backgroundColor = originalBg;
+        colorOverrides.forEach(({ obj, prop, original }) => { obj[prop] = original; });
+        canvas.renderAll();
+
+        const printImage = document.getElementById('print-image');
+        printImage.src = dataUrl;
+        printImage.style.width = `${plan.printedWidthCm}cm`;
+        printImage.style.height = `${plan.printedHeightCm}cm`;
+        closePrintModal();
+        setTimeout(() => window.print(), 200);
     });
 
     downloadBtn.addEventListener('click', () => {

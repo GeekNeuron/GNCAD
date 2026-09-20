@@ -12,7 +12,7 @@
         <header id="app-header">
             <h1>NaqshCAD</h1>
             <div id="header-actions">
-                <div class="dropdown"><button id="file-menu-btn" class="header-btn">File</button><div id="file-menu-dropdown" class="dropdown-content"><a href="#" id="new-btn">New Canvas</a><a href="#" id="save-btn">Save Project</a><a href="#" id="load-btn">Load Project</a><a href="#" id="import-dxf-btn">Import DXF...</a><hr><a href="#" id="export-btn">Export Image...</a><a href="#" id="export-dxf-btn">Export as DXF</a></div></div>
+                <div class="dropdown"><button id="file-menu-btn" class="header-btn">File</button><div id="file-menu-dropdown" class="dropdown-content"><a href="#" id="new-btn">New Canvas</a><a href="#" id="save-btn">Save Project</a><a href="#" id="load-btn">Load Project</a><a href="#" id="import-dxf-btn">Import DXF...</a><hr><a href="#" id="export-btn">Export Image...</a><a href="#" id="export-dxf-btn">Export as DXF</a><a href="#" id="print-btn">Print with Scale...</a></div></div>
                 <button id="theme-toggle-btn" class="header-btn" title="Toggle Theme"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" /><path d="M3 12h1m8 -9v1m8 8h1m-9 8v1m-6.4 -15.4l.7 .7m12.1 -.7l-.7 .7m0 11.4l.7 .7m-12.1 -.7l-.7 .7" /></svg></button>
                 <button id="undo-btn" class="header-btn" title="Undo (Ctrl+Z)" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14l-4 -4l4 -4" /><path d="M5 10h11a4 4 0 1 1 0 8h-1" /></svg></button>
                 <button id="redo-btn" class="header-btn" title="Redo (Ctrl+Y)" disabled><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 14l4 -4l-4 -4" /><path d="M19 10h-11a4 4 0 1 0 0 8h1" /></svg></button>
@@ -75,9 +75,9 @@
                 <div id="zoom-display">Zoom: 100%</div>
                 <button id="zoom-in-btn" class="status-bar-btn" title="Zoom In"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M7 10l6 0" /><path d="M10 7l0 6" /><path d="M21 21l-6 -6" /></svg></button>
             </div>
-            <div class="toggle-container"><input type="checkbox" id="show-rulers-checkbox" checked><label for="show-rulers-checkbox">Show Rulers</label></div>
-            <div class="toggle-container" id="snap-toggle"><input type="checkbox" id="snap-checkbox" checked><label for="snap-checkbox">Snap to Grid</label></div>
-            <div class="toggle-container" id="object-snap-toggle"><input type="checkbox" id="object-snap-checkbox" checked><label for="object-snap-checkbox">Object Snap</label></div>
+            <div class="toggle-container"><input type="checkbox" id="show-rulers-checkbox" checked><label for="show-rulers-checkbox"><span class="label-full">Show Rulers</span><span class="label-short">Rulers</span></label></div>
+            <div class="toggle-container" id="snap-toggle"><input type="checkbox" id="snap-checkbox" checked><label for="snap-checkbox"><span class="label-full">Snap to Grid</span><span class="label-short">Snap</span></label></div>
+            <div class="toggle-container" id="object-snap-toggle"><input type="checkbox" id="object-snap-checkbox" checked><label for="object-snap-checkbox"><span class="label-full">Object Snap</span><span class="label-short">OSnap</span></label></div>
         </footer>
     </div>
 
@@ -110,6 +110,27 @@
         </div>
         <div class="modal-footer"><button id="array-apply-btn" class="action-btn">Apply</button></div>
     </div>
+
+    <div id="print-modal-overlay" class="hidden"></div>
+    <div id="print-modal" class="hidden">
+        <div class="modal-header"><h2>Print with Scale</h2><button id="close-print-modal-btn">&times;</button></div>
+        <div class="modal-body">
+            <div class="prop-item"><label for="print-scale">Scale</label><select id="print-scale">
+                <option value="20">1:20</option>
+                <option value="50" selected>1:50</option>
+                <option value="100">1:100</option>
+                <option value="200">1:200</option>
+            </select></div>
+            <div class="prop-item"><label for="print-paper">Paper Size</label><select id="print-paper">
+                <option value="a4">A4 (21 x 29.7 cm)</option>
+                <option value="letter">Letter (21.6 x 27.9 cm)</option>
+            </select></div>
+            <div class="prop-item"><label>Orientation</label><div class="radio-group"><input type="radio" id="print-portrait" name="print-orientation" value="portrait" checked><label for="print-portrait">Portrait</label><input type="radio" id="print-landscape" name="print-orientation" value="landscape"><label for="print-landscape">Landscape</label></div></div>
+            <div id="print-fit-hint" class="prop-hint"></div>
+        </div>
+        <div class="modal-footer"><button id="print-apply-btn" class="action-btn">Print</button></div>
+    </div>
+    <div id="print-container"><img id="print-image" alt="Print preview"></div>
     
     <script src="lib/fabric.min.js"></script>
     <script src="lib/dxf-parser.js"></script>
